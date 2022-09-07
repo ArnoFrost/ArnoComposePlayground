@@ -4,10 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +42,8 @@ fun SimpleAnimationSection() {
 @Composable
 fun ShowCompose() {
     var score by remember { mutableStateOf(0) }
+
+//    var scoreList =  remember { mutableStateListOf<Int>() }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -56,5 +55,7 @@ fun ShowCompose() {
         Button(onClick = { score++ }) {
             Text(text = "Click me")
         }
+//        Divider()
+//        Spacer(Modifier.height(20.dp))
     }
 }
