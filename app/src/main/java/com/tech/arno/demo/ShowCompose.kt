@@ -42,8 +42,6 @@ fun SimpleAnimationSection() {
 @Composable
 fun ShowCompose() {
     var score by remember { mutableStateOf(0) }
-
-//    var scoreList =  remember { mutableStateListOf<Int>() }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -55,7 +53,5 @@ fun ShowCompose() {
         Button(onClick = { score++ }) {
             Text(text = "Click me")
         }
-//        Divider()
-//        Spacer(Modifier.height(20.dp))
     }
 }
