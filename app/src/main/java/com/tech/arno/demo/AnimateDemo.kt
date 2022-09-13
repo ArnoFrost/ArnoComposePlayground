@@ -11,9 +11,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun TestAnimateState(isBig: Boolean, onBoxClick: () -> Unit) {
@@ -25,24 +28,42 @@ fun TestAnimateState(isBig: Boolean, onBoxClick: () -> Unit) {
 }
 
 @Composable
-fun LineRoundIsland(isBig: Boolean, onBoxClick: () -> Unit) {
+fun LineRoundIsland(isBig: Boolean, isAuto: Boolean, onBoxClick: () -> Unit) {
+    val scope = rememberCoroutineScope()
     val size by animateDpAsState(if (isBig) 196.dp else 24.dp) //animateXXXAsState
     Card(shape = RoundedCornerShape(24.dp)) {
         Box(modifier = Modifier
             .height(24.dp)
             .width(size)
             .background(Color.Black)
-            .clickable { onBoxClick.invoke() })
+            .clickable {
+                onBoxClick.invoke()
+                if (isAuto) {
+                    scope.launch {
+                        delay(3000)
+                        onBoxClick.invoke()
+                    }
+                }
+            })
     }
 }
 
 @Composable
-fun BigRoundIsland(isBig: Boolean, onBoxClick: () -> Unit) {
+fun BigRoundIsland(isBig: Boolean, isAuto: Boolean, onBoxClick: () -> Unit) {
+    val scope = rememberCoroutineScope()
     val size by animateDpAsState(if (isBig) 196.dp else 24.dp) //animateXXXAsState
     Card(shape = RoundedCornerShape(24.dp)) {
         Box(modifier = Modifier
             .size(size)
             .background(Color.Black)
-            .clickable { onBoxClick.invoke() })
+            .clickable {
+                onBoxClick.invoke()
+                if (isAuto) {
+                    scope.launch {
+                        delay(3000)
+                        onBoxClick.invoke()
+                    }
+                }
+            })
     }
 }
