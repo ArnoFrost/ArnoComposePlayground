@@ -41,7 +41,7 @@ fun SimpleAnimationSection() {
 @Preview(showBackground = true)
 @Composable
 fun ShowCompose() {
-    var score by remember { mutableStateOf(0) }
+    var score by remember() { mutableStateOf(0) }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,4 +54,19 @@ fun ShowCompose() {
             Text(text = "Click me")
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun testEdit() {
+    var inputString by remember { mutableStateOf("hello") }
+    OutlinedTextField(
+        value = inputString,
+        onValueChange = { changeValue ->
+            inputString = if (changeValue.length <= 5) {
+                changeValue
+            } else {
+                changeValue.slice(0..5)
+            }
+        })
 }
