@@ -1,5 +1,7 @@
 package com.tech.arno.demo
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,6 +63,7 @@ fun AutoRoundLineIsland(
     var isClickable by remember { mutableStateOf(true) }
     LineRoundIsland(isExpanded = isExpanded, isClickable = isClickable) {
         isClickable = false
+        onIslandClick.invoke()
         scope.launch {
             delay(duration)
             onIslandClick.invoke()
@@ -90,9 +93,10 @@ fun LineRoundIsland(
             width = DynamicConst.DEFAULT_WIDTH
         ),
         targetSize = DynamicConst.DynamicSize(
-            height = DynamicConst.SMALL_WIDTH,
-            width = DynamicConst.SMALL_HEIGHT
+            height = DynamicConst.LINE_HEIGHT,
+            width = DynamicConst.LINE_WIDTH
         ),
+        roundCorner = DynamicConst.LINE_CORNER,
         onIslandClick = onIslandClick
     )
 }
@@ -113,15 +117,30 @@ fun BasicDynamicIsland(
     isClickable: Boolean = true,
     default: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
-    roundCorner: Dp = DynamicConst.SMALL_HEIGHT,
+    roundCorner: Dp = DynamicConst.DEFAULT_CORNER,
     onIslandClick: () -> Unit
 ) {
-    val width by animateDpAsState(if (isExpanded) targetSize.width else default.width) //animateXXXAsState
-    val height by animateDpAsState(if (isExpanded) targetSize.height else default.height) //animateXXXAsState
-    Card(shape = RoundedCornerShape(roundCorner)) {
+    //animateXXXAsState
+//    val width by animateDpAsState(if (isExpanded) targetSize.width else default.width)
+//    val height by animateDpAsState(if (isExpanded) targetSize.height else default.height)
+
+    val width = remember(isExpanded) { if (isExpanded) targetSize.width else default.width }
+    val height = remember(isExpanded) { if (isExpanded) targetSize.height else default.height }
+    val corner = remember(isExpanded) { if (isExpanded) roundCorner else DynamicConst.DEFAULT_CORNER }
+
+    val animWidth = remember { Animatable(width, Dp.VectorConverter) }
+    val animHeight = remember { Animatable(height, Dp.VectorConverter) }
+    val animCorner = remember { Animatable(corner, Dp.VectorConverter) }
+
+    LaunchedEffect(isExpanded) {
+        animWidth.animateTo(width)
+        animHeight.animateTo(height)
+        animCorner.animateTo(corner)
+    }
+    Card(shape = RoundedCornerShape(animCorner.value)) {
         Box(modifier = Modifier
-            .height(height)
-            .width(width)
+            .height(animHeight.value)
+            .width(animWidth.value)
             .background(Color.Black)
             .clickable(enabled = isClickable) {
                 onIslandClick.invoke()
