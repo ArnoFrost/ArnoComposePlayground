@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 /**
  * 混合类型岛屿🏝️
  *
- * @param type [DynamicConst.TYPE_LINE] [DynamicConst.TYPE_CARD] [DynamicConst.TYPE_BIG]
+ * @param type [DynamicConst.DynamicType.Line] [DynamicConst.DynamicType.Card] [DynamicConst.DynamicType.Big]
  * @param isExpanded [Boolean] 是否展开
  * @param duration [Long] 展开动画时长
  * @param onIslandClick [() -> Unit] 点击岛屿回调
@@ -31,6 +32,8 @@ fun AutoDynamicIsland(
     type: DynamicConst.DynamicType,
     isExpanded: Boolean,
     duration: Long,
+    autoClose: Boolean = false,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
@@ -38,18 +41,24 @@ fun AutoDynamicIsland(
         DynamicConst.DynamicType.Line -> AutoLineRoundIsland(
             isExpanded = isExpanded,
             duration = duration,
+            autoClose = autoClose,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
         DynamicConst.DynamicType.Card -> AutoCardRoundIsland(
             isExpanded = isExpanded,
             duration = duration,
+            autoClose = autoClose,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
         DynamicConst.DynamicType.Big -> AutoBigRoundIsland(
             isExpanded = isExpanded,
             duration = duration,
+            autoClose = autoClose,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
@@ -59,24 +68,31 @@ fun AutoDynamicIsland(
 @Composable
 fun DynamicIsland(
     type: DynamicConst.DynamicType,
-    isExpanded: Boolean,
     duration: Long,
+    isExpanded: Boolean,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     when (type) {
         DynamicConst.DynamicType.Line -> LineRoundIsland(
+            duration = duration,
             isExpanded = isExpanded,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
         DynamicConst.DynamicType.Card -> CardRoundIsland(
+            duration = duration,
             isExpanded = isExpanded,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
         DynamicConst.DynamicType.Big -> BigRoundIsland(
+            duration = duration,
             isExpanded = isExpanded,
+            finishListener = finishListener,
             onIslandClick = onIslandClick,
             content = content
         )
@@ -88,26 +104,38 @@ fun DynamicIsland(
  *
  * @param isExpanded
  * @param duration
+ * @param autoClose
  * @param onIslandClick
  */
 @Composable
 fun AutoLineRoundIsland(
     isExpanded: Boolean,
     duration: Long,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
+    autoClose: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
-    LineRoundIsland(isExpanded = isExpanded, isClickable = isClickable, onIslandClick = {
-        isClickable = false
-        onIslandClick.invoke()
-        scope.launch {
-            delay(duration)
+    LineRoundIsland(
+        duration = duration,
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        finishListener = finishListener,
+        onIslandClick = {
+            isClickable = false
             onIslandClick.invoke()
-            isClickable = true
-        }
-    }, content = content)
+            if (autoClose) {
+                scope.launch {
+                    delay(1500L)
+                    onIslandClick.invoke()
+                    isClickable = true
+                }
+            }
+        },
+        content = content
+    )
 }
 
 /**
@@ -119,15 +147,18 @@ fun AutoLineRoundIsland(
  */
 @Composable
 fun LineRoundIsland(
+    duration: Long,
     isExpanded: Boolean,
     isClickable: Boolean = true,
     onIslandClick: () -> Unit,
+    finishListener: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     BasicDynamicIsland(
+        duration = duration,
         isExpanded = isExpanded,
         isClickable = isClickable,
-        default = DynamicConst.DynamicSize(
+        defaultSize = DynamicConst.DynamicSize(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
@@ -137,6 +168,7 @@ fun LineRoundIsland(
             width = DynamicConst.LINE_WIDTH,
             corner = DynamicConst.LINE_CORNER,
         ),
+        finishListener = finishListener,
         onIslandClick = onIslandClick,
         content = content
     )
@@ -147,26 +179,38 @@ fun LineRoundIsland(
  *
  * @param isExpanded
  * @param duration
+ * @param autoClose
  * @param onIslandClick
  */
 @Composable
 fun AutoCardRoundIsland(
     isExpanded: Boolean,
     duration: Long,
+    autoClose: Boolean = false,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
-    CardRoundIsland(isExpanded = isExpanded, isClickable = isClickable, onIslandClick = {
-        isClickable = false
-        onIslandClick.invoke()
-        scope.launch {
-            delay(duration)
+    CardRoundIsland(
+        duration = duration,
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        finishListener = finishListener,
+        onIslandClick = {
+            isClickable = false
             onIslandClick.invoke()
-            isClickable = true
-        }
-    }, content = content)
+            if (autoClose) {
+                scope.launch {
+                    delay(1500L)
+                    onIslandClick.invoke()
+                    isClickable = true
+                }
+            }
+        },
+        content = content
+    )
 }
 
 /**
@@ -178,15 +222,18 @@ fun AutoCardRoundIsland(
  */
 @Composable
 fun CardRoundIsland(
+    duration: Long,
     isExpanded: Boolean,
     isClickable: Boolean = true,
     onIslandClick: () -> Unit,
+    finishListener: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     BasicDynamicIsland(
+        duration = duration,
         isExpanded = isExpanded,
         isClickable = isClickable,
-        default = DynamicConst.DynamicSize(
+        defaultSize = DynamicConst.DynamicSize(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
@@ -196,6 +243,7 @@ fun CardRoundIsland(
             width = DynamicConst.CARD_WIDTH,
             corner = DynamicConst.CARD_CORNER,
         ),
+        finishListener = finishListener,
         onIslandClick = onIslandClick,
         content = content
     )
@@ -206,27 +254,34 @@ fun CardRoundIsland(
  *
  * @param isExpanded
  * @param duration
+ * @param autoClose
  * @param onIslandClick
  */
 @Composable
 fun AutoBigRoundIsland(
     isExpanded: Boolean,
     duration: Long,
+    autoClose: Boolean = false,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
     BigRoundIsland(
+        duration = duration,
         isExpanded = isExpanded,
         isClickable = isClickable,
+        finishListener = finishListener,
         onIslandClick = {
             isClickable = false
             onIslandClick.invoke()
-            scope.launch {
-                delay(duration)
-                onIslandClick.invoke()
-                isClickable = true
+            if (autoClose) {
+                scope.launch {
+                    delay(1500L)
+                    onIslandClick.invoke()
+                    isClickable = true
+                }
             }
         }, content = content
     )
@@ -241,15 +296,18 @@ fun AutoBigRoundIsland(
  */
 @Composable
 fun BigRoundIsland(
+    duration: Long,
     isExpanded: Boolean,
     isClickable: Boolean = true,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BasicDynamicIsland(
+        duration = duration,
         isExpanded = isExpanded,
         isClickable = isClickable,
-        default = DynamicConst.DynamicSize(
+        defaultSize = DynamicConst.DynamicSize(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
@@ -259,27 +317,67 @@ fun BigRoundIsland(
             width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
             corner = DynamicConst.BIG_CORNER,
         ),
+        finishListener = finishListener,
         onIslandClick = onIslandClick,
         content = content
     )
 }
 
+@Composable
+fun AutoBasicDynamicIsland(
+    isExpanded: Boolean,
+    duration: Long,
+    defaultSize: DynamicConst.DynamicSize,
+    targetSize: DynamicConst.DynamicSize,
+    finishListener: (() -> Unit)? = null,
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isClickable by remember { mutableStateOf(true) }
+    BasicDynamicIsland(
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        defaultSize = defaultSize,
+        targetSize = targetSize,
+        finishListener = finishListener,
+        onIslandClick = {
+            isClickable = false
+            onIslandClick.invoke()
+            //正数才启动，否则不自动回收
+            if (duration > 0) {
+                scope.launch {
+                    delay(duration)
+                    onIslandClick.invoke()
+                    isClickable = true
+                }
+            }
+
+        }, content = content
+    )
+}
+
+
 /**
  * 基础岛🏝️
  *
- * @param isExpanded
- * @param isClickable
- * @param default
- * @param targetSize
- * @param onIslandClick
+ * @param isExpanded 是否展开
+ * @param duration 动画时长
+ * @param isClickable 是否可点击
+ * @param defaultSize 默认大小
+ * @param targetSize 目标大小
+ * @param finishListener 动画结束监听
+ * @param onIslandClick 点击事件
+ * @param content 内容
  */
 @Composable
 fun BasicDynamicIsland(
-    modifier: Modifier = Modifier,
     isExpanded: Boolean,
+    duration: Long = DynamicConst.DEFAULT_ANIMATION_DURATION, //TODO
     isClickable: Boolean = true,
-    default: DynamicConst.DynamicSize,
+    defaultSize: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
+    finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit,
 ) {
@@ -287,15 +385,18 @@ fun BasicDynamicIsland(
     val springSpec = Spring.DampingRatioLowBouncy
     //animateXXXAsState
     val widthState by animateDpAsState(
-        if (isExpanded) targetSize.width else default.width,
-        animationSpec = spring(springSpec)
+        if (isExpanded) targetSize.width else defaultSize.width,
+        animationSpec = spring(springSpec),
+        finishedListener = { dp: Dp ->
+            finishListener?.invoke()
+        }
     )
     val heightState by animateDpAsState(
-        if (isExpanded) targetSize.height else default.height,
+        if (isExpanded) targetSize.height else defaultSize.height,
         animationSpec = spring(springSpec)
     )
     val cornerState by animateDpAsState(
-        if (isExpanded) targetSize.corner else default.corner,
+        if (isExpanded) targetSize.corner else defaultSize.corner,
         animationSpec = spring(springSpec)
     )
 
@@ -325,9 +426,9 @@ fun BasicDynamicIsland(
     //endregion
 
 ////region 流程定制型
-//    val width = remember(isExpanded) { if (isExpanded) targetSize.width else default.width }
-//    val height = remember(isExpanded) { if (isExpanded) targetSize.height else default.height }
-//    val corner = remember(isExpanded) { if (isExpanded) targetSize.corner else default.corner }
+//    val width = remember(isExpanded) { if (isExpanded) targetSize.width else defaultSize.width }
+//    val height = remember(isExpanded) { if (isExpanded) targetSize.height else defaultSize.height }
+//    val corner = remember(isExpanded) { if (isExpanded) targetSize.corner else defaultSize.corner }
 //
 //    val animWidth = remember { Animatable(width, Dp.VectorConverter) }
 //    val animHeight = remember { Animatable(height, Dp.VectorConverter) }
