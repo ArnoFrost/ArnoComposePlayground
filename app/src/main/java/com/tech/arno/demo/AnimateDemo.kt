@@ -1,8 +1,6 @@
 package com.tech.arno.demo
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.VectorConverter
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,9 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tech.arno.const.DynamicConst
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 fun PreviewDynamicIsland() {
     var isLineExpanded by remember { mutableStateOf(false) }
     var isCardExpanded by remember { mutableStateOf(false) }
+    var isBigExpanded by remember { mutableStateOf(false) }
     val duration = 1500L
     Column(
         modifier = Modifier
@@ -38,16 +39,45 @@ fun PreviewDynamicIsland() {
     ) {
         Text("条幅通知")
         Spacer(Modifier.height(16.dp))
-        AutoLineRoundIsland(isExpanded = isLineExpanded, duration) {
-            isLineExpanded = !isLineExpanded
+        AutoLineRoundIsland(
+            isExpanded = isLineExpanded,
+            duration = duration,
+            onIslandClick = { isLineExpanded = !isLineExpanded }) {
+            Text(
+                text = "条幅岛🏝️",
+                color = Color.White,
+                fontSize = 14.sp
+            )
         }
 
         Spacer(Modifier.height(16.dp))
 
         Text("卡片通知")
         Spacer(Modifier.height(16.dp))
-        AutoCardRoundIsland(isExpanded = isCardExpanded, duration) {
-            isCardExpanded = !isCardExpanded
+        AutoCardRoundIsland(
+            isExpanded = isCardExpanded,
+            duration = duration,
+            onIslandClick = { isCardExpanded = !isCardExpanded }) {
+            Text(
+                text = "卡片岛🏝️",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Text("扩展通知")
+        Spacer(Modifier.height(16.dp))
+        AutoBigRoundIsland(
+            isExpanded = isBigExpanded,
+            duration = duration,
+            onIslandClick = { isBigExpanded = !isBigExpanded }) {
+            Text(
+                text = "扩展岛🏝️",
+                color = Color.White,
+                fontSize = 16.sp
+            )
         }
     }
 }
@@ -63,11 +93,12 @@ fun PreviewDynamicIsland() {
 fun AutoLineRoundIsland(
     isExpanded: Boolean,
     duration: Long,
-    onIslandClick: () -> Unit
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
-    LineRoundIsland(isExpanded = isExpanded, isClickable = isClickable) {
+    LineRoundIsland(isExpanded = isExpanded, isClickable = isClickable, onIslandClick = {
         isClickable = false
         onIslandClick.invoke()
         scope.launch {
@@ -75,7 +106,7 @@ fun AutoLineRoundIsland(
             onIslandClick.invoke()
             isClickable = true
         }
-    }
+    }, content = content)
 }
 
 /**
@@ -89,7 +120,8 @@ fun AutoLineRoundIsland(
 fun LineRoundIsland(
     isExpanded: Boolean,
     isClickable: Boolean = true,
-    onIslandClick: () -> Unit
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     BasicDynamicIsland(
         isExpanded = isExpanded,
@@ -104,7 +136,8 @@ fun LineRoundIsland(
             width = DynamicConst.LINE_WIDTH,
             corner = DynamicConst.LINE_CORNER,
         ),
-        onIslandClick = onIslandClick
+        onIslandClick = onIslandClick,
+        content = content
     )
 }
 
@@ -119,11 +152,12 @@ fun LineRoundIsland(
 fun AutoCardRoundIsland(
     isExpanded: Boolean,
     duration: Long,
-    onIslandClick: () -> Unit
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
-    CardRoundIsland(isExpanded = isExpanded, isClickable = isClickable) {
+    CardRoundIsland(isExpanded = isExpanded, isClickable = isClickable, onIslandClick = {
         isClickable = false
         onIslandClick.invoke()
         scope.launch {
@@ -131,7 +165,7 @@ fun AutoCardRoundIsland(
             onIslandClick.invoke()
             isClickable = true
         }
-    }
+    }, content = content)
 }
 
 /**
@@ -145,7 +179,8 @@ fun AutoCardRoundIsland(
 fun CardRoundIsland(
     isExpanded: Boolean,
     isClickable: Boolean = true,
-    onIslandClick: () -> Unit
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
 ) {
     BasicDynamicIsland(
         isExpanded = isExpanded,
@@ -160,7 +195,71 @@ fun CardRoundIsland(
             width = DynamicConst.CARD_WIDTH,
             corner = DynamicConst.CARD_CORNER,
         ),
-        onIslandClick = onIslandClick
+        onIslandClick = onIslandClick,
+        content = content
+    )
+}
+
+/**
+ * 带有自动回滚的大卡片的动态岛🏝️
+ *
+ * @param isExpanded
+ * @param duration
+ * @param onIslandClick
+ */
+@Composable
+fun AutoBigRoundIsland(
+    isExpanded: Boolean,
+    duration: Long,
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+    var isClickable by remember { mutableStateOf(true) }
+    BigRoundIsland(
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        onIslandClick = {
+            isClickable = false
+            onIslandClick.invoke()
+            scope.launch {
+                delay(duration)
+                onIslandClick.invoke()
+                isClickable = true
+            }
+        }, content = content
+    )
+}
+
+/**
+ * 大的动态岛🏝️
+ *
+ * @param isExpanded
+ * @param isClickable
+ * @param onIslandClick
+ */
+@Composable
+fun BigRoundIsland(
+    isExpanded: Boolean,
+    isClickable: Boolean = true,
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    BasicDynamicIsland(
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        default = DynamicConst.DynamicSize(
+            height = DynamicConst.DEFAULT_HEIGHT,
+            width = DynamicConst.DEFAULT_WIDTH,
+            corner = DynamicConst.DEFAULT_CORNER,
+        ),
+        targetSize = DynamicConst.DynamicSize(
+            height = DynamicConst.BIG_HEIGHT,
+            width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
+            corner = DynamicConst.BIG_CORNER,
+        ),
+        onIslandClick = onIslandClick,
+        content = content
     )
 }
 
@@ -175,26 +274,52 @@ fun CardRoundIsland(
  */
 @Composable
 fun BasicDynamicIsland(
+    modifier: Modifier = Modifier,
     isExpanded: Boolean,
     isClickable: Boolean = true,
     default: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
-    onIslandClick: () -> Unit
+    onIslandClick: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     //region 状态转移型动画
+    val springSpec = Spring.DampingRatioLowBouncy
     //animateXXXAsState
-    val widthState by animateDpAsState(if (isExpanded) targetSize.width else default.width)
-    val heightState by animateDpAsState(if (isExpanded) targetSize.height else default.height)
-    val cornerState by animateDpAsState(if (isExpanded) targetSize.corner else default.corner)
+    val widthState by animateDpAsState(
+        if (isExpanded) targetSize.width else default.width,
+        animationSpec = spring(springSpec)
+    )
+    val heightState by animateDpAsState(
+        if (isExpanded) targetSize.height else default.height,
+        animationSpec = spring(springSpec)
+    )
+    val cornerState by animateDpAsState(
+        if (isExpanded) targetSize.corner else default.corner,
+        animationSpec = spring(springSpec)
+    )
 
-    Card(shape = RoundedCornerShape(cornerState), elevation = 8.dp) {
-        Box(modifier = Modifier
+    Card(
+        modifier = Modifier
             .height(heightState)
             .width(widthState)
-            .background(Color.Black)
             .clickable(enabled = isClickable) {
                 onIslandClick.invoke()
-            })
+            },
+        shape = RoundedCornerShape(cornerState),
+        elevation = 8.dp,
+        backgroundColor = Color.Black
+
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isExpanded) {
+                content.invoke()
+            }
+        }
     }
     //endregion
 
@@ -210,23 +335,38 @@ fun BasicDynamicIsland(
     LaunchedEffect(isExpanded) {
         if (isExpanded) {
             animCorner.animateTo(corner)
-            animHeight.animateTo(height)
-            animWidth.animateTo(width)
+            animHeight.animateTo(height, spring(springSpec))
+            animWidth.animateTo(width, spring(springSpec))
+
         } else {
-            animHeight.animateTo(height)
-            animWidth.animateTo(width)
+            animHeight.animateTo(height, spring(springSpec))
+            animWidth.animateTo(width, spring(springSpec))
             animCorner.animateTo(corner)
         }
 
     }
-    Card(shape = RoundedCornerShape(animCorner.value), elevation = 8.dp) {
-        Box(modifier = Modifier
+    Card(
+        modifier = Modifier
             .height(animHeight.value)
             .width(animWidth.value)
-            .background(Color.Black)
             .clickable(enabled = isClickable) {
                 onIslandClick.invoke()
-            })
+            },
+        shape = RoundedCornerShape(animCorner.value),
+        elevation = 8.dp,
+        backgroundColor = Color.Black
+
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            if (isExpanded) {
+                content.invoke()
+            }
+        }
     }
 //endregion
 }
