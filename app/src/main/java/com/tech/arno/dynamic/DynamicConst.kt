@@ -1,4 +1,4 @@
-package com.tech.arno.const
+package com.tech.arno.dynamic
 
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -24,8 +24,8 @@ class DynamicConst {
         val BIG_WIDTH_MARGIN = 30.dp
         val BIG_HEIGHT = 150.dp
         val BIG_CORNER = 24.dp
-
     }
+
 
     /**
      * 配置尺寸
@@ -35,4 +35,14 @@ class DynamicConst {
      * @property corner
      */
     data class DynamicSize(val height: Dp, val width: Dp, val corner: Dp)
+
+    /**
+     * 岛屿类型定义
+     *
+     */
+    sealed class DynamicType {
+        object Line : DynamicType()
+        object Card : DynamicType()
+        object Big : DynamicType()
+    }
 }
