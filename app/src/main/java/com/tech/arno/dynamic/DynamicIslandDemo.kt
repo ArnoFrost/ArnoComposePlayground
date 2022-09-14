@@ -30,36 +30,40 @@ fun PreviewDemo() {
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(Modifier.height(16.dp))
 
-        AutoDynamicIsland(type = islandType,
+        AutoDynamicIsland(
+            type = islandType,
             duration = duration,
             isExpanded = isExpanded,
             autoClose = true,
             onIslandClick = triggerDynamic,
             finishListener = {
-                if (!isExpanded) {
-                    islandType = islandType.nextType()
-                }
+//                if (!isExpanded) {
+//                    islandType = islandType.nextType()
+//                }
             }) {
             DynamicScreen(islandType)
         }
         Spacer(Modifier.height(40.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-            Button(onClick = {
-                islandType = DynamicConst.DynamicType.Line
-                triggerDynamic.invoke()
-            }) {
+            Button(
+                onClick = {
+                    islandType = DynamicConst.DynamicType.Line
+                    triggerDynamic.invoke()
+                }) {
                 Text("简短")
             }
-            Button(onClick = {
-                islandType = DynamicConst.DynamicType.Card
-                triggerDynamic.invoke()
-            }) {
+            Button(
+                onClick = {
+                    islandType = DynamicConst.DynamicType.Card
+                    triggerDynamic.invoke()
+                }) {
                 Text("卡片")
             }
-            Button(onClick = {
-                islandType = DynamicConst.DynamicType.Big
-                triggerDynamic.invoke()
-            }) {
+            Button(
+                onClick = {
+                    islandType = DynamicConst.DynamicType.Big
+                    triggerDynamic.invoke()
+                }) {
                 Text("扩展")
             }
         }
@@ -99,9 +103,15 @@ fun PreviewDynamicIsland() {
     }
 }
 
+/**
+ * 演示用动态切换效果
+ *
+ * @param type
+ */
 @Composable
-fun DynamicScreen(type: DynamicConst.DynamicType) {
-    when (type) {
+private fun DynamicScreen(type: DynamicConst.DynamicType) {
+    val dynamicType by remember(type) { mutableStateOf(type) }
+    when (dynamicType) {
         DynamicConst.DynamicType.Line -> {
             Text(
                 "简短通知🏝️", fontSize = 14.sp, color = Color.White
