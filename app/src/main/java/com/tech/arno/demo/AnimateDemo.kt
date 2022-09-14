@@ -6,22 +6,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tech.arno.const.DynamicConst
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-
+/**
+ * 预览效果测试
+ *
+ */
 @Preview(showBackground = true)
 @Composable
 fun PreviewDynamicIsland() {
-    var isBig by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
     val duration = 1500L
     Column(
         modifier = Modifier
@@ -34,40 +38,93 @@ fun PreviewDynamicIsland() {
             Spacer(Modifier.width(16.dp))
         }
         Spacer(Modifier.height(16.dp))
-        AutoRoundLineIsland(isBig = isBig, duration) {
-            isBig = !isBig
+        AutoRoundLineIsland(isExpanded = isExpanded, duration) {
+            isExpanded = !isExpanded
         }
     }
 }
 
+/**
+ * 带有自动回滚的横线变化岛🏝️
+ *
+ * @param isExpanded
+ * @param duration
+ * @param onIslandClick
+ */
 @Composable
 fun AutoRoundLineIsland(
-    isBig: Boolean,
+    isExpanded: Boolean,
     duration: Long,
-    onBoxClick: () -> Unit
+    onIslandClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
-    LineRoundIsland(isBig = isBig, isClickable = isClickable) {
+    LineRoundIsland(isExpanded = isExpanded, isClickable = isClickable) {
         isClickable = false
         scope.launch {
             delay(duration)
-            onBoxClick.invoke()
+            onIslandClick.invoke()
             isClickable = true
         }
     }
 }
 
+/**
+ * 横线变化岛🏝️
+ *
+ * @param isExpanded
+ * @param isClickable
+ * @param onIslandClick
+ */
 @Composable
-fun LineRoundIsland(isBig: Boolean, isClickable: Boolean = true, onBoxClick: () -> Unit) {
-    val size by animateDpAsState(if (isBig) 196.dp else 24.dp) //animateXXXAsState
-    Card(shape = RoundedCornerShape(24.dp)) {
+fun LineRoundIsland(
+    isExpanded: Boolean,
+    isClickable: Boolean = true,
+    onIslandClick: () -> Unit
+) {
+    BasicDynamicIsland(
+        isExpanded = isExpanded,
+        isClickable = isClickable,
+        default = DynamicConst.DynamicSize(
+            height = DynamicConst.DEFAULT_HEIGHT,
+            width = DynamicConst.DEFAULT_WIDTH
+        ),
+        targetSize = DynamicConst.DynamicSize(
+            height = DynamicConst.SMALL_WIDTH,
+            width = DynamicConst.SMALL_HEIGHT
+        ),
+        onIslandClick = onIslandClick
+    )
+}
+
+/**
+ * 基础岛🏝️
+ *
+ * @param isExpanded
+ * @param isClickable
+ * @param default
+ * @param targetSize
+ * @param roundCorner
+ * @param onIslandClick
+ */
+@Composable
+fun BasicDynamicIsland(
+    isExpanded: Boolean,
+    isClickable: Boolean = true,
+    default: DynamicConst.DynamicSize,
+    targetSize: DynamicConst.DynamicSize,
+    roundCorner: Dp = DynamicConst.SMALL_HEIGHT,
+    onIslandClick: () -> Unit
+) {
+    val width by animateDpAsState(if (isExpanded) targetSize.width else default.width) //animateXXXAsState
+    val height by animateDpAsState(if (isExpanded) targetSize.height else default.height) //animateXXXAsState
+    Card(shape = RoundedCornerShape(roundCorner)) {
         Box(modifier = Modifier
-            .height(24.dp)
-            .width(size)
+            .height(height)
+            .width(width)
             .background(Color.Black)
             .clickable(enabled = isClickable) {
-                onBoxClick.invoke()
+                onIslandClick.invoke()
             })
     }
 }
