@@ -1,6 +1,8 @@
 package com.tech.arno.dynamic
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,17 +21,16 @@ fun PreviewDemo() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.Start
     ) {
+        //region 配置属性
         val aniDuration = 3000L
         val autoCloseInterval = 3000L
         val direction = DynamicDirection.Center
         var isExpanded by remember { mutableStateOf(false) }
         var islandType by remember { mutableStateOf<DynamicType>(DynamicType.Line) }
         val triggerDynamic = { isExpanded = !isExpanded }
-        Text("类型: ${islandType.javaClass.simpleName}")
-        Spacer(Modifier.height(16.dp))
         val screenWith = LocalConfiguration.current.screenWidthDp
+        val scrollState = rememberScrollState()
 
-        //region 配置属性
         var dynamicDefaultOffSetX by remember { mutableStateOf(0F) }
         var dynamicDefaultOffSetY by remember { mutableStateOf(0F) }
         var dynamicDefaultWidth by remember { mutableStateOf(24F) }
@@ -47,7 +48,8 @@ fun PreviewDemo() {
             }
         }
         //endregion
-
+        Text("类型: ${islandType.javaClass.simpleName}")
+        Spacer(Modifier.height(16.dp))
         AutoDynamicIsland(
             type = islandType,
             isExpanded = isExpanded,
@@ -58,7 +60,7 @@ fun PreviewDemo() {
             defaultSize = defaultSize.value,
             onIslandClick = triggerDynamic
         ) {
-            DynamicScreen(islandType)
+            DynamicContentScreen(islandType)
         }
         Spacer(Modifier.height(40.dp))
         //测试按钮
@@ -87,7 +89,10 @@ fun PreviewDemo() {
         }
         Spacer(Modifier.height(16.dp))
         //配置信息
-        Column(verticalArrangement = Arrangement.SpaceAround) {
+        Column(
+            Modifier.verticalScroll(scrollState),
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
             Row(
                 Modifier
                     .wrapContentSize()
@@ -102,14 +107,19 @@ fun PreviewDemo() {
                     onValueChange = { x ->
                         dynamicDefaultOffSetX = x
                     })
-//                OutlinedTextField(
-//                    value = dynamicDefaultOffSetX.toString(),
-//                    onValueChange = { value ->
-//                        if (value.toFloat() >= 0) {
-//                            dynamicDefaultOffSetX = value.toFloat()
-//                        }
-//                    })
             }
+            OutlinedTextField(
+                value = dynamicDefaultOffSetX.toString(),
+                onValueChange = { value ->
+                    dynamicDefaultOffSetX = if (value.toFloatOrNull() != null) {
+                        value.toFloat()
+                    } else {
+                        0F
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("横坐标X") },
+            )
             Row(
                 Modifier
                     .wrapContentSize()
@@ -122,6 +132,18 @@ fun PreviewDemo() {
                     dynamicDefaultOffSetY = y
                 })
             }
+            OutlinedTextField(
+                value = dynamicDefaultOffSetY.toString(),
+                onValueChange = { value ->
+                    dynamicDefaultOffSetY = if (value.toFloatOrNull() != null) {
+                        value.toFloat()
+                    } else {
+                        0F
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("纵坐标Y") },
+            )
             Row(
                 Modifier
                     .wrapContentSize()
@@ -196,7 +218,7 @@ fun PreviewDynamicIsland() {
                     islandType = islandType.nextType()
                 }
             }) {
-            DynamicScreen(islandType)
+            DynamicContentScreen(islandType)
         }
     }
 }
@@ -207,7 +229,7 @@ fun PreviewDynamicIsland() {
  * @param type
  */
 @Composable
-private fun DynamicScreen(type: DynamicType) {
+fun DynamicContentScreen(type: DynamicType) {
     when (type) {
         DynamicType.Line -> {
             Text(

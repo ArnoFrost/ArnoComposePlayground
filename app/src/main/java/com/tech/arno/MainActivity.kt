@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.tech.arno.dynamic.PreviewDemo
-import com.tech.arno.service.ForegroundService
+import com.tech.arno.dynamic.service.DynamicFloatService
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,8 +25,8 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PreviewDemo()
-//                checkOverlayPermission()
-//                startService()
+                checkOverlayPermission()
+                startService()
             }
         }
     }
@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
         // the Draw over other apps permission
         if (Settings.canDrawOverlays(this)) {
             // start the service based on the android version
-            startForegroundService(Intent(this, ForegroundService::class.java))
+            startForegroundService(Intent(this, DynamicFloatService::class.java))
         }
     }
 }
