@@ -1,21 +1,17 @@
 package com.tech.arno.dynamic.service
 
-import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.view.*
-import androidx.compose.runtime.*
 import androidx.core.app.NotificationCompat
 import com.tech.arno.R
-import com.tech.arno.dynamic.*
+import com.tech.arno.dynamic.DynamicWindow
 
 class DynamicFloatService : Service() {
     private var dynamicWindow: DynamicWindow? = null
-
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
