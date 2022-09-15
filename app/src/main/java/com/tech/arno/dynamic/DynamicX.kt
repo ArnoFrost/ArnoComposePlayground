@@ -5,8 +5,8 @@ package com.tech.arno.dynamic
  *
  * @return
  */
-fun DynamicConst.DynamicType.nextType(): DynamicConst.DynamicType = when (this) {
-    DynamicConst.DynamicType.Line -> DynamicConst.DynamicType.Card
-    DynamicConst.DynamicType.Card -> DynamicConst.DynamicType.Big
-    DynamicConst.DynamicType.Big -> DynamicConst.DynamicType.Line
+fun DynamicType.nextType(): DynamicType = when (this) {
+    DynamicType.Line -> DynamicType.Card
+    DynamicType.Card -> DynamicType.Big
+    DynamicType.Big -> DynamicType.Line
 }

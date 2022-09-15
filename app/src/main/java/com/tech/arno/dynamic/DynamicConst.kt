@@ -27,8 +27,6 @@ class DynamicConst {
         val BIG_HEIGHT = 150.dp
         val BIG_CORNER = 24.dp
     }
-
-
     /**
      * 配置尺寸
      *
@@ -41,14 +39,24 @@ class DynamicConst {
         val width: Dp = DEFAULT_WIDTH,
         val corner: Dp = DEFAULT_CORNER
     )
+}
 
-    /**
-     * 岛屿类型定义
-     *
-     */
-    sealed class DynamicType {
-        object Line : DynamicType()
-        object Card : DynamicType()
-        object Big : DynamicType()
-    }
+/**
+ * 岛屿类型定义
+ *
+ */
+sealed class DynamicType {
+    object Line : DynamicType()
+    object Card : DynamicType()
+    object Big : DynamicType()
+}
+
+/**
+ * 扩展方向定义
+ *
+ */
+sealed class DynamicDirection {
+    object Left : DynamicDirection()
+    object Center : DynamicDirection()
+    object Right : DynamicDirection()
 }

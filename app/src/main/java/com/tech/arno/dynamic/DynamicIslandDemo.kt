@@ -21,16 +21,18 @@ fun PreviewDemo() {
     ) {
         val aniDuration = 3000L
         val autoCloseInterval = 3000L
+        val direction = DynamicDirection.Center
         var isExpanded by remember { mutableStateOf(false) }
-        var islandType by remember { mutableStateOf<DynamicConst.DynamicType>(DynamicConst.DynamicType.Line) }
+        var islandType by remember { mutableStateOf<DynamicType>(DynamicType.Line) }
         val triggerDynamic = { isExpanded = !isExpanded }
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(Modifier.height(16.dp))
 
         AutoDynamicIsland(
             type = islandType,
-            aniDuration = aniDuration,
             isExpanded = isExpanded,
+            direction = direction,
+            aniDuration = aniDuration,
             autoClose = true,
             autoCloseInterval = autoCloseInterval,
             onIslandClick = triggerDynamic
@@ -41,21 +43,21 @@ fun PreviewDemo() {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             Button(
                 onClick = {
-                    islandType = DynamicConst.DynamicType.Line
+                    islandType = DynamicType.Line
                     triggerDynamic.invoke()
                 }) {
                 Text("简短")
             }
             Button(
                 onClick = {
-                    islandType = DynamicConst.DynamicType.Card
+                    islandType = DynamicType.Card
                     triggerDynamic.invoke()
                 }) {
                 Text("卡片")
             }
             Button(
                 onClick = {
-                    islandType = DynamicConst.DynamicType.Big
+                    islandType = DynamicType.Big
                     triggerDynamic.invoke()
                 }) {
                 Text("扩展")
@@ -71,8 +73,8 @@ fun PreviewDynamicIsland() {
     val aniDuration = 1500L
     var isExpanded by remember { mutableStateOf(false) }
     var islandType by remember {
-        mutableStateOf<DynamicConst.DynamicType>(
-            DynamicConst.DynamicType.Line
+        mutableStateOf<DynamicType>(
+            DynamicType.Line
         )
     }
     Column(
@@ -103,21 +105,21 @@ fun PreviewDynamicIsland() {
  * @param type
  */
 @Composable
-private fun DynamicScreen(type: DynamicConst.DynamicType) {
+private fun DynamicScreen(type: DynamicType) {
     when (type) {
-        DynamicConst.DynamicType.Line -> {
+        DynamicType.Line -> {
             Text(
                 "简短通知🏝️", fontSize = 14.sp, color = Color.White
             )
         }
-        DynamicConst.DynamicType.Card -> {
+        DynamicType.Card -> {
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
                     "卡片通知🏝️️", fontSize = 16.sp, color = Color.White
                 )
             }
         }
-        DynamicConst.DynamicType.Big -> {
+        DynamicType.Big -> {
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
                     "扩展通知🏝️", fontSize = 16.sp, color = Color.White

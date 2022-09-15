@@ -22,9 +22,10 @@ import kotlinx.coroutines.launch
 /**
  * 混合类型岛屿🏝️
  *
- * @param type [DynamicConst.DynamicType.Line] [DynamicConst.DynamicType.Card] [DynamicConst.DynamicType.Big]
+ * @param type [DynamicType.Line] [DynamicType.Card] [DynamicType.Big]
  * @param isExpanded [Boolean] 是否展开
  * @param aniDuration [Long] 展开动画时长
+ * @param direction [DynamicDirection] 展开方向
  * @param autoClose [Boolean] 是否自动关闭
  * @param autoCloseInterval [Long] 自动关闭间隔
  * @param finishListener [Long] 展开动画时长
@@ -33,9 +34,10 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun AutoDynamicIsland(
-    type: DynamicConst.DynamicType,
+    type: DynamicType,
     isExpanded: Boolean,
     aniDuration: Long,
+    direction: DynamicDirection = DynamicDirection.Center,
     autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
     finishListener: (() -> Unit)? = null,
@@ -49,12 +51,13 @@ fun AutoDynamicIsland(
         corner = DynamicConst.DEFAULT_CORNER
     )
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val targetSize by remember(type) { mutableStateOf(getTargetSize(type, screenWidth)) }
+    val targetSize by remember(type) { mutableStateOf(getTargetSizeByType(type, screenWidth)) }
     //endregion
 
     BasicAutoDynamicIsland(
         isExpanded = isExpanded,
         aniDuration = aniDuration,
+        direction = direction,
         autoClose = autoClose,
         autoCloseInterval = autoCloseInterval,
         finishListener = finishListener,
@@ -69,10 +72,11 @@ fun AutoDynamicIsland(
 /**
  * 基础的自动动态岛🏝️
  *
- * @param isExpanded
- * @param aniDuration
- * @param autoClose
- * @param autoCloseInterval
+ * @param isExpanded [Boolean] 是否展开
+ * @param aniDuration [Long] 展开动画时长
+ * @param direction [DynamicDirection] 布局方向
+ * @param autoClose [Boolean] 是否自动关闭
+ * @param autoCloseInterval [Long] 自动关闭间隔
  * @param defaultSize
  * @param targetSize
  * @param finishListener
@@ -83,7 +87,8 @@ fun AutoDynamicIsland(
 inline fun BasicAutoDynamicIsland(
     isExpanded: Boolean,
     aniDuration: Long,
-    autoClose: Boolean,
+    direction: DynamicDirection = DynamicDirection.Center,
+    autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
     defaultSize: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
@@ -105,6 +110,7 @@ inline fun BasicAutoDynamicIsland(
     }
     BasicDynamicIsland(
         isExpanded = isExpanded,
+        direction = direction,
         aniDuration = aniDuration,
         isClickable = isClickable,
         defaultSize = defaultSize,
@@ -122,6 +128,7 @@ inline fun BasicAutoDynamicIsland(
  * 基础岛🏝️
  *
  * @param isExpanded 是否展开
+ * @param direction [DynamicDirection] 展开方向
  * @param aniDuration 动画时长
  * @param isClickable 是否可点击
  * @param defaultSize 默认大小
@@ -133,6 +140,7 @@ inline fun BasicAutoDynamicIsland(
 @Composable
 fun BasicDynamicIsland(
     isExpanded: Boolean,
+    direction: DynamicDirection = DynamicDirection.Center,
     aniDuration: Long = DynamicConst.DEFAULT_ANIMATION_DURATION, //TODO
     isClickable: Boolean = true,
     defaultSize: DynamicConst.DynamicSize,
@@ -159,6 +167,7 @@ fun BasicDynamicIsland(
         if (isExpanded) targetSize.corner else defaultSize.corner,
         animationSpec = spring(springSpec)
     )
+    val alignment by remember(direction) { mutableStateOf(getAlignmentByDirection(direction)) }
 
     Card(
         modifier = Modifier
@@ -176,7 +185,7 @@ fun BasicDynamicIsland(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp),
-            contentAlignment = Alignment.Center
+            contentAlignment = alignment
         ) {
             if (isExpanded) {
                 content.invoke()
@@ -308,32 +317,46 @@ inline fun AutoBigRoundIsland(
  * @param screenWidthDp
  * @return
  */
-private fun getTargetSize(
-    type: DynamicConst.DynamicType,
+private fun getTargetSizeByType(
+    type: DynamicType,
     screenWidthDp: Dp
 ): DynamicConst.DynamicSize {
     return when (type) {
-        DynamicConst.DynamicType.Line -> {
+        DynamicType.Line -> {
             DynamicConst.DynamicSize(
                 height = DynamicConst.LINE_HEIGHT,
                 width = DynamicConst.LINE_WIDTH,
                 corner = DynamicConst.LINE_CORNER,
             )
         }
-        DynamicConst.DynamicType.Card -> {
+        DynamicType.Card -> {
             DynamicConst.DynamicSize(
                 height = DynamicConst.CARD_HEIGHT,
                 width = DynamicConst.CARD_WIDTH,
                 corner = DynamicConst.CARD_CORNER,
             )
         }
-        DynamicConst.DynamicType.Big -> {
+        DynamicType.Big -> {
             DynamicConst.DynamicSize(
                 height = DynamicConst.BIG_HEIGHT,
                 width = screenWidthDp - DynamicConst.BIG_WIDTH_MARGIN,
                 corner = DynamicConst.BIG_CORNER,
             )
         }
+    }
+}
+
+/**
+ * 基于方向控制对齐方式
+ *
+ * @param direction
+ * @return
+ */
+private fun getAlignmentByDirection(direction: DynamicDirection): Alignment {
+    return when (direction) {
+        DynamicDirection.Left -> Alignment.CenterStart
+        DynamicDirection.Right -> Alignment.CenterEnd
+        DynamicDirection.Center -> Alignment.Center
     }
 }
 //endregion
