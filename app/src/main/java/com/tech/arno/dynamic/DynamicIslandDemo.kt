@@ -19,7 +19,8 @@ fun PreviewDemo() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val duration = 1500L
+        val aniDuration = 3000L
+        val autoCloseInterval = 3000L
         var isExpanded by remember { mutableStateOf(false) }
         var islandType by remember { mutableStateOf<DynamicConst.DynamicType>(DynamicConst.DynamicType.Line) }
         val triggerDynamic = { isExpanded = !isExpanded }
@@ -28,9 +29,10 @@ fun PreviewDemo() {
 
         AutoDynamicIsland(
             type = islandType,
-            duration = duration,
+            aniDuration = aniDuration,
             isExpanded = isExpanded,
             autoClose = true,
+            autoCloseInterval = autoCloseInterval,
             onIslandClick = triggerDynamic
         ) {
             DynamicScreen(islandType)
@@ -66,7 +68,7 @@ fun PreviewDemo() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewDynamicIsland() {
-    val duration = 1500L
+    val aniDuration = 1500L
     var isExpanded by remember { mutableStateOf(false) }
     var islandType by remember {
         mutableStateOf<DynamicConst.DynamicType>(
@@ -81,7 +83,7 @@ fun PreviewDynamicIsland() {
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(modifier = Modifier.height(16.dp))
         AutoDynamicIsland(type = islandType,
-            duration = duration,
+            aniDuration = aniDuration,
             isExpanded = isExpanded,
             autoClose = true,
             onIslandClick = { isExpanded = !isExpanded },
@@ -136,7 +138,7 @@ fun PreviewSingleDynamicIsland() {
     var isLineExpanded by remember { mutableStateOf(false) }
     var isCardExpanded by remember { mutableStateOf(false) }
     var isBigExpanded by remember { mutableStateOf(false) }
-    val duration = 1500L
+    val aniDuration = 1500L
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -147,7 +149,7 @@ fun PreviewSingleDynamicIsland() {
         Spacer(Modifier.height(16.dp))
         AutoLineRoundIsland(
             isExpanded = isLineExpanded,
-            duration = duration,
+            aniDuration = aniDuration,
             autoClose = true,
             onIslandClick = { isLineExpanded = !isLineExpanded }) {
             Text(
@@ -161,7 +163,7 @@ fun PreviewSingleDynamicIsland() {
         Spacer(Modifier.height(16.dp))
         AutoCardRoundIsland(
             isExpanded = isCardExpanded,
-            duration = duration,
+            aniDuration = aniDuration,
             autoClose = true,
             onIslandClick = { isCardExpanded = !isCardExpanded }) {
             Text(
@@ -175,7 +177,7 @@ fun PreviewSingleDynamicIsland() {
         Spacer(Modifier.height(16.dp))
         AutoBigRoundIsland(
             isExpanded = isBigExpanded,
-            duration = duration,
+            aniDuration = aniDuration,
             autoClose = true,
             onIslandClick = { isBigExpanded = !isBigExpanded }) {
             Text(

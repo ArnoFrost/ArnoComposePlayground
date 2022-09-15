@@ -18,12 +18,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
+//region 1. 主要功能暴露
 /**
  * 混合类型岛屿🏝️
  *
  * @param type [DynamicConst.DynamicType.Line] [DynamicConst.DynamicType.Card] [DynamicConst.DynamicType.Big]
  * @param isExpanded [Boolean] 是否展开
- * @param duration [Long] 展开动画时长
+ * @param aniDuration [Long] 展开动画时长
+ * @param autoClose [Boolean] 是否自动关闭
+ * @param autoCloseInterval [Long] 自动关闭间隔
+ * @param finishListener [Long] 展开动画时长
  * @param onIslandClick [() -> Unit] 点击岛屿回调
  * @param content [@Composable] 岛屿内容
  */
@@ -31,50 +35,28 @@ import kotlinx.coroutines.launch
 fun AutoDynamicIsland(
     type: DynamicConst.DynamicType,
     isExpanded: Boolean,
-    duration: Long,
+    aniDuration: Long,
     autoClose: Boolean = false,
+    autoCloseInterval: Long = 1500L,
     finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    val defaultSize by remember {
-        mutableStateOf(
-            DynamicConst.DynamicSize(
-                height = DynamicConst.DEFAULT_HEIGHT,
-                width = DynamicConst.DEFAULT_WIDTH,
-                corner = DynamicConst.DEFAULT_CORNER
-            )
-        )
-    }
-    var targetSize by remember { mutableStateOf(DynamicConst.DynamicSize()) }
-    when (type) {
-        DynamicConst.DynamicType.Line -> {
-            targetSize = DynamicConst.DynamicSize(
-                height = DynamicConst.LINE_HEIGHT,
-                width = DynamicConst.LINE_WIDTH,
-                corner = DynamicConst.LINE_CORNER,
-            )
-        }
-        DynamicConst.DynamicType.Card -> {
-            targetSize = DynamicConst.DynamicSize(
-                height = DynamicConst.CARD_HEIGHT,
-                width = DynamicConst.CARD_WIDTH,
-                corner = DynamicConst.CARD_CORNER,
-            )
-        }
-        DynamicConst.DynamicType.Big -> {
-            targetSize = DynamicConst.DynamicSize(
-                height = DynamicConst.BIG_HEIGHT,
-                width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
-                corner = DynamicConst.BIG_CORNER,
-            )
-        }
-    }
+    //region 初始设定
+    val defaultSize = DynamicConst.DynamicSize(
+        height = DynamicConst.DEFAULT_HEIGHT,
+        width = DynamicConst.DEFAULT_WIDTH,
+        corner = DynamicConst.DEFAULT_CORNER
+    )
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val targetSize by remember(type) { mutableStateOf(getTargetSize(type, screenWidth)) }
+    //endregion
 
     BasicAutoDynamicIsland(
         isExpanded = isExpanded,
-        duration = duration,
+        aniDuration = aniDuration,
         autoClose = autoClose,
+        autoCloseInterval = autoCloseInterval,
         finishListener = finishListener,
         defaultSize = defaultSize,
         targetSize = targetSize,
@@ -83,122 +65,26 @@ fun AutoDynamicIsland(
     )
 }
 
-/**
- * 带有自动回滚的横线变化岛🏝️
- *
- * @param isExpanded
- * @param duration
- * @param autoClose
- * @param onIslandClick
- */
-@JvmOverloads
-@Composable
-inline fun AutoLineRoundIsland(
-    isExpanded: Boolean,
-    duration: Long,
-    autoClose: Boolean = false,
-    noinline finishListener: (() -> Unit)? = null,
-    crossinline onIslandClick: () -> Unit,
-    crossinline content: @Composable () -> Unit
-) {
-    BasicAutoDynamicIsland(
-        isExpanded = isExpanded,
-        duration = duration,
-        autoClose = autoClose,
-        finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
-            height = DynamicConst.DEFAULT_HEIGHT,
-            width = DynamicConst.DEFAULT_WIDTH,
-            corner = DynamicConst.DEFAULT_CORNER,
-        ),
-        targetSize = DynamicConst.DynamicSize(
-            height = DynamicConst.LINE_HEIGHT,
-            width = DynamicConst.LINE_WIDTH,
-            corner = DynamicConst.LINE_CORNER,
-        ),
-        onIslandClick = onIslandClick,
-        content = content
-    )
-}
 
 /**
- * 带有自动回滚的卡片样式的动态岛🏝️
+ * 基础的自动动态岛🏝️
  *
  * @param isExpanded
- * @param duration
+ * @param aniDuration
  * @param autoClose
+ * @param autoCloseInterval
+ * @param defaultSize
+ * @param targetSize
+ * @param finishListener
  * @param onIslandClick
+ * @param content
  */
-@Composable
-inline fun AutoCardRoundIsland(
-    isExpanded: Boolean,
-    duration: Long,
-    autoClose: Boolean,
-    noinline finishListener: (() -> Unit)? = null,
-    crossinline onIslandClick: () -> Unit,
-    crossinline content: @Composable () -> Unit
-) {
-    BasicAutoDynamicIsland(
-        isExpanded = isExpanded,
-        duration = duration,
-        autoClose = autoClose,
-        finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
-            height = DynamicConst.DEFAULT_HEIGHT,
-            width = DynamicConst.DEFAULT_WIDTH,
-            corner = DynamicConst.DEFAULT_CORNER,
-        ),
-        targetSize = DynamicConst.DynamicSize(
-            height = DynamicConst.CARD_HEIGHT,
-            width = DynamicConst.CARD_WIDTH,
-            corner = DynamicConst.CARD_CORNER,
-        ),
-        onIslandClick = onIslandClick,
-        content = content
-    )
-}
-
-/**
- * 带有自动回滚的大卡片的动态岛🏝️
- *
- * @param isExpanded
- * @param duration
- * @param autoClose
- * @param onIslandClick
- */
-@Composable
-inline fun AutoBigRoundIsland(
-    isExpanded: Boolean,
-    duration: Long,
-    autoClose: Boolean,
-    noinline finishListener: (() -> Unit)? = null,
-    crossinline onIslandClick: () -> Unit,
-    crossinline content: @Composable () -> Unit
-) {
-    BasicAutoDynamicIsland(
-        isExpanded = isExpanded,
-        duration = duration,
-        autoClose = autoClose,
-        finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
-            height = DynamicConst.DEFAULT_HEIGHT,
-            width = DynamicConst.DEFAULT_WIDTH,
-            corner = DynamicConst.DEFAULT_CORNER,
-        ),
-        targetSize = DynamicConst.DynamicSize(
-            height = DynamicConst.BIG_HEIGHT,
-            width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
-            corner = DynamicConst.BIG_CORNER,
-        ),
-        onIslandClick = onIslandClick, content = content
-    )
-}
-
 @Composable
 inline fun BasicAutoDynamicIsland(
     isExpanded: Boolean,
-    duration: Long,
+    aniDuration: Long,
     autoClose: Boolean,
+    autoCloseInterval: Long = 1500L,
     defaultSize: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
     noinline finishListener: (() -> Unit)? = null,
@@ -211,7 +97,7 @@ inline fun BasicAutoDynamicIsland(
     LaunchedEffect(isExpanded) {
         if (autoClose && isExpanded) {
             scope.launch {
-                delay(1500L)
+                delay(autoCloseInterval)
                 onIslandClick.invoke()
                 isClickable = true
             }
@@ -219,7 +105,7 @@ inline fun BasicAutoDynamicIsland(
     }
     BasicDynamicIsland(
         isExpanded = isExpanded,
-        duration = duration,
+        aniDuration = aniDuration,
         isClickable = isClickable,
         defaultSize = defaultSize,
         targetSize = targetSize,
@@ -236,7 +122,7 @@ inline fun BasicAutoDynamicIsland(
  * 基础岛🏝️
  *
  * @param isExpanded 是否展开
- * @param duration 动画时长
+ * @param aniDuration 动画时长
  * @param isClickable 是否可点击
  * @param defaultSize 默认大小
  * @param targetSize 目标大小
@@ -247,7 +133,7 @@ inline fun BasicAutoDynamicIsland(
 @Composable
 fun BasicDynamicIsland(
     isExpanded: Boolean,
-    duration: Long = DynamicConst.DEFAULT_ANIMATION_DURATION, //TODO
+    aniDuration: Long = DynamicConst.DEFAULT_ANIMATION_DURATION, //TODO
     isClickable: Boolean = true,
     defaultSize: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
@@ -299,3 +185,155 @@ fun BasicDynamicIsland(
     }
     //endregion
 }
+//endregion
+
+//region 2. 次要样式暴露
+/**
+ * 带有自动回滚的横线变化岛🏝️
+ *
+ * @param isExpanded
+ * @param aniDuration
+ * @param autoClose
+ * @param onIslandClick
+ */
+@JvmOverloads
+@Composable
+inline fun AutoLineRoundIsland(
+    isExpanded: Boolean,
+    aniDuration: Long,
+    autoClose: Boolean = false,
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
+) {
+    BasicAutoDynamicIsland(
+        isExpanded = isExpanded,
+        aniDuration = aniDuration,
+        autoClose = autoClose,
+        finishListener = finishListener,
+        defaultSize = DynamicConst.DynamicSize(
+            height = DynamicConst.DEFAULT_HEIGHT,
+            width = DynamicConst.DEFAULT_WIDTH,
+            corner = DynamicConst.DEFAULT_CORNER,
+        ),
+        targetSize = DynamicConst.DynamicSize(
+            height = DynamicConst.LINE_HEIGHT,
+            width = DynamicConst.LINE_WIDTH,
+            corner = DynamicConst.LINE_CORNER,
+        ),
+        onIslandClick = onIslandClick,
+        content = content
+    )
+}
+
+/**
+ * 带有自动回滚的卡片样式的动态岛🏝️
+ *
+ * @param isExpanded
+ * @param aniDuration
+ * @param autoClose
+ * @param onIslandClick
+ */
+@Composable
+inline fun AutoCardRoundIsland(
+    isExpanded: Boolean,
+    aniDuration: Long,
+    autoClose: Boolean,
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
+) {
+    BasicAutoDynamicIsland(
+        isExpanded = isExpanded,
+        aniDuration = aniDuration,
+        autoClose = autoClose,
+        finishListener = finishListener,
+        defaultSize = DynamicConst.DynamicSize(
+            height = DynamicConst.DEFAULT_HEIGHT,
+            width = DynamicConst.DEFAULT_WIDTH,
+            corner = DynamicConst.DEFAULT_CORNER,
+        ),
+        targetSize = DynamicConst.DynamicSize(
+            height = DynamicConst.CARD_HEIGHT,
+            width = DynamicConst.CARD_WIDTH,
+            corner = DynamicConst.CARD_CORNER,
+        ),
+        onIslandClick = onIslandClick,
+        content = content
+    )
+}
+
+/**
+ * 带有自动回滚的大卡片的动态岛🏝️
+ *
+ * @param isExpanded
+ * @param aniDuration
+ * @param autoClose
+ * @param onIslandClick
+ */
+@Composable
+inline fun AutoBigRoundIsland(
+    isExpanded: Boolean,
+    aniDuration: Long,
+    autoClose: Boolean,
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
+) {
+    BasicAutoDynamicIsland(
+        isExpanded = isExpanded,
+        aniDuration = aniDuration,
+        autoClose = autoClose,
+        finishListener = finishListener,
+        defaultSize = DynamicConst.DynamicSize(
+            height = DynamicConst.DEFAULT_HEIGHT,
+            width = DynamicConst.DEFAULT_WIDTH,
+            corner = DynamicConst.DEFAULT_CORNER,
+        ),
+        targetSize = DynamicConst.DynamicSize(
+            height = DynamicConst.BIG_HEIGHT,
+            width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
+            corner = DynamicConst.BIG_CORNER,
+        ),
+        onIslandClick = onIslandClick, content = content
+    )
+}
+//endregion
+
+//region 3. 私有方法
+/**
+ * 根据类型生成目标尺寸
+ *
+ * @param type
+ * @param screenWidthDp
+ * @return
+ */
+private fun getTargetSize(
+    type: DynamicConst.DynamicType,
+    screenWidthDp: Dp
+): DynamicConst.DynamicSize {
+    return when (type) {
+        DynamicConst.DynamicType.Line -> {
+            DynamicConst.DynamicSize(
+                height = DynamicConst.LINE_HEIGHT,
+                width = DynamicConst.LINE_WIDTH,
+                corner = DynamicConst.LINE_CORNER,
+            )
+        }
+        DynamicConst.DynamicType.Card -> {
+            DynamicConst.DynamicSize(
+                height = DynamicConst.CARD_HEIGHT,
+                width = DynamicConst.CARD_WIDTH,
+                corner = DynamicConst.CARD_CORNER,
+            )
+        }
+        DynamicConst.DynamicType.Big -> {
+            DynamicConst.DynamicSize(
+                height = DynamicConst.BIG_HEIGHT,
+                width = screenWidthDp - DynamicConst.BIG_WIDTH_MARGIN,
+                corner = DynamicConst.BIG_CORNER,
+            )
+        }
+    }
+}
+//endregion
