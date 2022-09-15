@@ -2,6 +2,8 @@ package com.tech.arno.dynamic
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +30,22 @@ fun PreviewDemo() {
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(Modifier.height(16.dp))
 
+        //region 配置属性
+        var dynamicLocation by remember { mutableStateOf(Pair(0F, 0F)) }
+        var dynamicDefaultWidth by remember { mutableStateOf(24F) }
+        var dynamicDefaultHeight by remember { mutableStateOf(24F) }
+        var dynamicDefaultCorner by remember { mutableStateOf(24F) }
+        val defaultSize = remember {
+            derivedStateOf {
+                DynamicConst.DynamicSize(
+                    dynamicDefaultHeight.dp,
+                    dynamicDefaultWidth.dp,
+                    dynamicDefaultCorner.dp
+                )
+            }
+        }
+        //endregion
+
         AutoDynamicIsland(
             type = islandType,
             isExpanded = isExpanded,
@@ -35,6 +53,7 @@ fun PreviewDemo() {
             aniDuration = aniDuration,
             autoClose = true,
             autoCloseInterval = autoCloseInterval,
+            defaultSize = defaultSize.value,
             onIslandClick = triggerDynamic
         ) {
             DynamicScreen(islandType)
@@ -63,6 +82,78 @@ fun PreviewDemo() {
                 Text("扩展")
             }
         }
+        Spacer(Modifier.height(16.dp))
+        Column(verticalArrangement = Arrangement.SpaceAround) {
+            Row(
+                Modifier
+                    .wrapContentSize()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "横坐标X：")
+                Slider(valueRange = 0f..1f, value = 0.5f, onValueChange = { x ->
+                    dynamicLocation = Pair(x, dynamicLocation.second)
+                })
+            }
+            Row(
+                Modifier
+                    .wrapContentSize()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "纵坐标Y：")
+                Slider(valueRange = 0f..1f, value = 0.5f, onValueChange = { y ->
+                    dynamicLocation = Pair(dynamicLocation.first, y)
+                })
+            }
+            Row(
+                Modifier
+                    .wrapContentSize()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "宽度：")
+                Slider(valueRange = 0f..200f, value = dynamicDefaultWidth, onValueChange = { w ->
+                    dynamicDefaultWidth = w
+                    DynamicConst.DEFAULT_WIDTH = dynamicDefaultWidth.dp
+                })
+            }
+
+            Row(
+                Modifier
+                    .wrapContentSize()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "高度：")
+                Slider(valueRange = 0f..50f, value = dynamicDefaultHeight, onValueChange = { h ->
+                    dynamicDefaultHeight = h
+                    DynamicConst.DEFAULT_HEIGHT = dynamicDefaultHeight.dp
+                })
+            }
+
+            Row(
+                Modifier
+                    .wrapContentSize()
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "圆角：")
+                Slider(
+                    valueRange = 0f..40f,
+                    value = dynamicDefaultCorner,
+                    onValueChange = { corner ->
+                        dynamicDefaultCorner = corner
+                        DynamicConst.DEFAULT_HEIGHT = dynamicDefaultCorner.dp
+                    })
+            }
+        }
+
     }
 }
 

@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
  * @param direction [DynamicDirection] 展开方向
  * @param autoClose [Boolean] 是否自动关闭
  * @param autoCloseInterval [Long] 自动关闭间隔
+ * @param defaultSize [Dp] 默认大小
  * @param finishListener [Long] 展开动画时长
  * @param onIslandClick [() -> Unit] 点击岛屿回调
  * @param content [@Composable] 岛屿内容
@@ -40,16 +41,16 @@ fun AutoDynamicIsland(
     direction: DynamicDirection = DynamicDirection.Center,
     autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
+    defaultSize: DynamicConst.DynamicSize = DynamicConst.DynamicSize(
+        height = DynamicConst.DEFAULT_HEIGHT,
+        width = DynamicConst.DEFAULT_WIDTH,
+        corner = DynamicConst.DEFAULT_CORNER
+    ),
     finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     //region 初始设定
-    val defaultSize = DynamicConst.DynamicSize(
-        height = DynamicConst.DEFAULT_HEIGHT,
-        width = DynamicConst.DEFAULT_WIDTH,
-        corner = DynamicConst.DEFAULT_CORNER
-    )
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
     val targetSize by remember(type) { mutableStateOf(getTargetSizeByType(type, screenWidth)) }
     //endregion
@@ -183,8 +184,7 @@ fun BasicDynamicIsland(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
+                .fillMaxSize(),
             contentAlignment = alignment
         ) {
             if (isExpanded) {

@@ -8,9 +8,9 @@ class DynamicConst {
         val DEFAULT_ANIMATION_DURATION = 500L
 
         //默认尺寸
-        val DEFAULT_WIDTH = 24.dp
-        val DEFAULT_HEIGHT = 24.dp
-        val DEFAULT_CORNER = DEFAULT_HEIGHT
+        var DEFAULT_WIDTH = 24.dp
+        var DEFAULT_HEIGHT = 24.dp
+        var DEFAULT_CORNER = 24.dp
 
         //横线尺寸
         val LINE_WIDTH = 196.dp
