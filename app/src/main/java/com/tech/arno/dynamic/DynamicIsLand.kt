@@ -73,14 +73,15 @@ fun AutoDynamicIsland(
  * @param autoClose
  * @param onIslandClick
  */
+@JvmOverloads
 @Composable
-fun AutoLineRoundIsland(
+inline fun AutoLineRoundIsland(
     isExpanded: Boolean,
     duration: Long,
-    finishListener: (() -> Unit)? = null,
-    onIslandClick: () -> Unit,
     autoClose: Boolean = false,
-    content: @Composable () -> Unit
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
 ) {
     BasicAutoDynamicIsland(
         isExpanded = isExpanded,
@@ -111,13 +112,13 @@ fun AutoLineRoundIsland(
  * @param onIslandClick
  */
 @Composable
-fun AutoCardRoundIsland(
+inline fun AutoCardRoundIsland(
     isExpanded: Boolean,
     duration: Long,
     autoClose: Boolean,
-    finishListener: (() -> Unit)? = null,
-    onIslandClick: () -> Unit,
-    content: @Composable () -> Unit
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
 ) {
     BasicAutoDynamicIsland(
         isExpanded = isExpanded,
@@ -148,13 +149,13 @@ fun AutoCardRoundIsland(
  * @param onIslandClick
  */
 @Composable
-fun AutoBigRoundIsland(
+inline fun AutoBigRoundIsland(
     isExpanded: Boolean,
     duration: Long,
     autoClose: Boolean,
-    finishListener: (() -> Unit)? = null,
-    onIslandClick: () -> Unit,
-    content: @Composable () -> Unit
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
 ) {
     BasicAutoDynamicIsland(
         isExpanded = isExpanded,
@@ -176,15 +177,15 @@ fun AutoBigRoundIsland(
 }
 
 @Composable
-fun BasicAutoDynamicIsland(
+inline fun BasicAutoDynamicIsland(
     isExpanded: Boolean,
     duration: Long,
     autoClose: Boolean,
     defaultSize: DynamicConst.DynamicSize,
     targetSize: DynamicConst.DynamicSize,
-    finishListener: (() -> Unit)? = null,
-    onIslandClick: () -> Unit,
-    content: @Composable () -> Unit
+    noinline finishListener: (() -> Unit)? = null,
+    crossinline onIslandClick: () -> Unit,
+    crossinline content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var isClickable by remember { mutableStateOf(true) }
@@ -208,7 +209,7 @@ fun BasicAutoDynamicIsland(
         onIslandClick = {
             isClickable = false
             onIslandClick.invoke()
-        }, content = content
+        }, content = { content.invoke() }
     )
 }
 
@@ -279,51 +280,4 @@ fun BasicDynamicIsland(
         }
     }
     //endregion
-
-////region 流程定制型
-//    val width = remember(isExpanded) { if (isExpanded) targetSize.width else defaultSize.width }
-//    val height = remember(isExpanded) { if (isExpanded) targetSize.height else defaultSize.height }
-//    val corner = remember(isExpanded) { if (isExpanded) targetSize.corner else defaultSize.corner }
-//
-//    val animWidth = remember { Animatable(width, Dp.VectorConverter) }
-//    val animHeight = remember { Animatable(height, Dp.VectorConverter) }
-//    val animCorner = remember { Animatable(corner, Dp.VectorConverter) }
-//
-//    LaunchedEffect(isExpanded) {
-//        if (isExpanded) {
-//            animCorner.animateTo(corner)
-//            animHeight.animateTo(height, spring(springSpec))
-//            animWidth.animateTo(width, spring(springSpec))
-//
-//        } else {
-//            animHeight.animateTo(height, spring(springSpec))
-//            animWidth.animateTo(width, spring(springSpec))
-//            animCorner.animateTo(corner)
-//        }
-//
-//    }
-//    Card(
-//        modifier = Modifier
-//            .height(animHeight.value)
-//            .width(animWidth.value)
-//            .clickable(enabled = isClickable) {
-//                onIslandClick.invoke()
-//            },
-//        shape = RoundedCornerShape(animCorner.value),
-//        elevation = 8.dp,
-//        backgroundColor = Color.Black
-//
-//    ) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxSize()
-//                .padding(8.dp),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            if (isExpanded) {
-//                content.invoke()
-//            }
-//        }
-//    }
-////endregion
 }

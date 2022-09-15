@@ -21,11 +21,7 @@ fun PreviewDemo() {
     ) {
         val duration = 1500L
         var isExpanded by remember { mutableStateOf(false) }
-        var islandType by remember {
-            mutableStateOf<DynamicConst.DynamicType>(
-                DynamicConst.DynamicType.Line
-            )
-        }
+        var islandType by remember { mutableStateOf<DynamicConst.DynamicType>(DynamicConst.DynamicType.Line) }
         val triggerDynamic = { isExpanded = !isExpanded }
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(Modifier.height(16.dp))
@@ -35,12 +31,8 @@ fun PreviewDemo() {
             duration = duration,
             isExpanded = isExpanded,
             autoClose = true,
-            onIslandClick = triggerDynamic,
-            finishListener = {
-//                if (!isExpanded) {
-//                    islandType = islandType.nextType()
-//                }
-            }) {
+            onIslandClick = triggerDynamic
+        ) {
             DynamicScreen(islandType)
         }
         Spacer(Modifier.height(40.dp))
@@ -110,8 +102,7 @@ fun PreviewDynamicIsland() {
  */
 @Composable
 private fun DynamicScreen(type: DynamicConst.DynamicType) {
-    val dynamicType by remember(type) { mutableStateOf(type) }
-    when (dynamicType) {
+    when (type) {
         DynamicConst.DynamicType.Line -> {
             Text(
                 "简短通知🏝️", fontSize = 14.sp, color = Color.White
