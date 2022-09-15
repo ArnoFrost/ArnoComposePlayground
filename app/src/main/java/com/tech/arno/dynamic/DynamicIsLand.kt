@@ -37,32 +37,50 @@ fun AutoDynamicIsland(
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    when (type) {
-        DynamicConst.DynamicType.Line -> AutoLineRoundIsland(
-            isExpanded = isExpanded,
-            duration = duration,
-            autoClose = autoClose,
-            finishListener = finishListener,
-            onIslandClick = onIslandClick,
-            content = content
-        )
-        DynamicConst.DynamicType.Card -> AutoCardRoundIsland(
-            isExpanded = isExpanded,
-            duration = duration,
-            autoClose = autoClose,
-            finishListener = finishListener,
-            onIslandClick = onIslandClick,
-            content = content
-        )
-        DynamicConst.DynamicType.Big -> AutoBigRoundIsland(
-            isExpanded = isExpanded,
-            duration = duration,
-            autoClose = autoClose,
-            finishListener = finishListener,
-            onIslandClick = onIslandClick,
-            content = content
+    val defaultSize by remember {
+        mutableStateOf(
+            DynamicConst.DynamicSize(
+                height = DynamicConst.DEFAULT_HEIGHT,
+                width = DynamicConst.DEFAULT_WIDTH,
+                corner = DynamicConst.DEFAULT_CORNER
+            )
         )
     }
+    var targetSize by remember { mutableStateOf(DynamicConst.DynamicSize()) }
+    when (type) {
+        DynamicConst.DynamicType.Line -> {
+            targetSize = DynamicConst.DynamicSize(
+                height = DynamicConst.LINE_HEIGHT,
+                width = DynamicConst.LINE_WIDTH,
+                corner = DynamicConst.LINE_CORNER,
+            )
+        }
+        DynamicConst.DynamicType.Card -> {
+            targetSize = DynamicConst.DynamicSize(
+                height = DynamicConst.CARD_HEIGHT,
+                width = DynamicConst.CARD_WIDTH,
+                corner = DynamicConst.CARD_CORNER,
+            )
+        }
+        DynamicConst.DynamicType.Big -> {
+            targetSize = DynamicConst.DynamicSize(
+                height = DynamicConst.BIG_HEIGHT,
+                width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
+                corner = DynamicConst.BIG_CORNER,
+            )
+        }
+    }
+
+    BasicAutoDynamicIsland(
+        isExpanded = isExpanded,
+        duration = duration,
+        autoClose = autoClose,
+        finishListener = finishListener,
+        defaultSize = defaultSize,
+        targetSize = targetSize,
+        onIslandClick = onIslandClick,
+        content = content
+    )
 }
 
 /**

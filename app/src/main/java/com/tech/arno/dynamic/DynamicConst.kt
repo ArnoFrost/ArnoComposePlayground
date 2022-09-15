@@ -36,7 +36,11 @@ class DynamicConst {
      * @property width
      * @property corner
      */
-    data class DynamicSize(val height: Dp, val width: Dp, val corner: Dp)
+    data class DynamicSize(
+        val height: Dp = DEFAULT_HEIGHT,
+        val width: Dp = DEFAULT_WIDTH,
+        val corner: Dp = DEFAULT_CORNER
+    )
 
     /**
      * 岛屿类型定义
