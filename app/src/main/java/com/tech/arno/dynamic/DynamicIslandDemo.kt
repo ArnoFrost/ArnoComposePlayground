@@ -1,14 +1,12 @@
 package com.tech.arno.dynamic
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,7 +17,7 @@ fun PreviewDemo() {
     Column(
         Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
         val aniDuration = 3000L
         val autoCloseInterval = 3000L
@@ -29,9 +27,11 @@ fun PreviewDemo() {
         val triggerDynamic = { isExpanded = !isExpanded }
         Text("类型: ${islandType.javaClass.simpleName}")
         Spacer(Modifier.height(16.dp))
+        val screenWith = LocalConfiguration.current.screenWidthDp
 
         //region 配置属性
-        var dynamicLocation by remember { mutableStateOf(Pair(0F, 0F)) }
+        var dynamicDefaultOffSetX by remember { mutableStateOf(0F) }
+        var dynamicDefaultOffSetY by remember { mutableStateOf(0F) }
         var dynamicDefaultWidth by remember { mutableStateOf(24F) }
         var dynamicDefaultHeight by remember { mutableStateOf(24F) }
         var dynamicDefaultCorner by remember { mutableStateOf(24F) }
@@ -40,7 +40,9 @@ fun PreviewDemo() {
                 DynamicConst.DynamicSize(
                     dynamicDefaultHeight.dp,
                     dynamicDefaultWidth.dp,
-                    dynamicDefaultCorner.dp
+                    dynamicDefaultCorner.dp,
+                    dynamicDefaultOffSetX.dp,
+                    dynamicDefaultOffSetY.dp
                 )
             }
         }
@@ -59,6 +61,7 @@ fun PreviewDemo() {
             DynamicScreen(islandType)
         }
         Spacer(Modifier.height(40.dp))
+        //测试按钮
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             Button(
                 onClick = {
@@ -83,6 +86,7 @@ fun PreviewDemo() {
             }
         }
         Spacer(Modifier.height(16.dp))
+        //配置信息
         Column(verticalArrangement = Arrangement.SpaceAround) {
             Row(
                 Modifier
@@ -92,9 +96,19 @@ fun PreviewDemo() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "横坐标X：")
-                Slider(valueRange = 0f..1f, value = 0.5f, onValueChange = { x ->
-                    dynamicLocation = Pair(x, dynamicLocation.second)
-                })
+                Slider(
+                    valueRange = 0f..screenWith.toFloat(),
+                    value = dynamicDefaultOffSetX,
+                    onValueChange = { x ->
+                        dynamicDefaultOffSetX = x
+                    })
+//                OutlinedTextField(
+//                    value = dynamicDefaultOffSetX.toString(),
+//                    onValueChange = { value ->
+//                        if (value.toFloat() >= 0) {
+//                            dynamicDefaultOffSetX = value.toFloat()
+//                        }
+//                    })
             }
             Row(
                 Modifier
@@ -104,8 +118,8 @@ fun PreviewDemo() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "纵坐标Y：")
-                Slider(valueRange = 0f..1f, value = 0.5f, onValueChange = { y ->
-                    dynamicLocation = Pair(dynamicLocation.first, y)
+                Slider(valueRange = 0f..100f, value = dynamicDefaultOffSetY, onValueChange = { y ->
+                    dynamicDefaultOffSetY = y
                 })
             }
             Row(
@@ -118,7 +132,6 @@ fun PreviewDemo() {
                 Text(text = "宽度：")
                 Slider(valueRange = 0f..200f, value = dynamicDefaultWidth, onValueChange = { w ->
                     dynamicDefaultWidth = w
-                    DynamicConst.DEFAULT_WIDTH = dynamicDefaultWidth.dp
                 })
             }
 
@@ -132,7 +145,6 @@ fun PreviewDemo() {
                 Text(text = "高度：")
                 Slider(valueRange = 0f..50f, value = dynamicDefaultHeight, onValueChange = { h ->
                     dynamicDefaultHeight = h
-                    DynamicConst.DEFAULT_HEIGHT = dynamicDefaultHeight.dp
                 })
             }
 
@@ -149,7 +161,6 @@ fun PreviewDemo() {
                     value = dynamicDefaultCorner,
                     onValueChange = { corner ->
                         dynamicDefaultCorner = corner
-                        DynamicConst.DEFAULT_HEIGHT = dynamicDefaultCorner.dp
                     })
             }
         }

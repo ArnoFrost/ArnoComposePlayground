@@ -169,29 +169,34 @@ fun BasicDynamicIsland(
         animationSpec = spring(springSpec)
     )
     val alignment by remember(direction) { mutableStateOf(getAlignmentByDirection(direction)) }
+    val offsetX by remember(defaultSize) { mutableStateOf(defaultSize.offsetX) }
+    val offsetY by remember(defaultSize) { mutableStateOf(defaultSize.offsetY) }
 
-    Card(
-        modifier = Modifier
-            .height(heightState)
-            .width(widthState)
-            .clickable(enabled = isClickable) {
-                onIslandClick.invoke()
-            },
-        shape = RoundedCornerShape(cornerState),
-        elevation = 8.dp,
-        backgroundColor = Color.Black
-
-    ) {
-        Box(
+    Box(Modifier.offset(offsetX, offsetY)) {
+        Card(
             modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = alignment
+                .height(heightState)
+                .width(widthState)
+                .clickable(enabled = isClickable) {
+                    onIslandClick.invoke()
+                },
+            shape = RoundedCornerShape(cornerState),
+            elevation = 8.dp,
+            backgroundColor = Color.Black
+
         ) {
-            if (isExpanded) {
-                content.invoke()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = alignment
+            ) {
+                if (isExpanded) {
+                    content.invoke()
+                }
             }
         }
     }
+
     //endregion
 }
 //endregion
@@ -298,6 +303,8 @@ inline fun AutoBigRoundIsland(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
+            offsetX = DynamicConst.DEFAULT_OFFSET_X,
+            offsetY = DynamicConst.DEFAULT_OFFSET_Y
         ),
         targetSize = DynamicConst.DynamicSize(
             height = DynamicConst.BIG_HEIGHT,

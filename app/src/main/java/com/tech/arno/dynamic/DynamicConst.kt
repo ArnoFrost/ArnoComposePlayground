@@ -5,12 +5,14 @@ import androidx.compose.ui.unit.dp
 
 class DynamicConst {
     companion object {
-        val DEFAULT_ANIMATION_DURATION = 500L
+        const val DEFAULT_ANIMATION_DURATION = 500L
 
         //默认尺寸
         var DEFAULT_WIDTH = 24.dp
         var DEFAULT_HEIGHT = 24.dp
         var DEFAULT_CORNER = 24.dp
+        var DEFAULT_OFFSET_X = 0.dp
+        var DEFAULT_OFFSET_Y = 0.dp
 
         //横线尺寸
         val LINE_WIDTH = 196.dp
@@ -27,6 +29,7 @@ class DynamicConst {
         val BIG_HEIGHT = 150.dp
         val BIG_CORNER = 24.dp
     }
+
     /**
      * 配置尺寸
      *
@@ -37,7 +40,9 @@ class DynamicConst {
     data class DynamicSize(
         val height: Dp = DEFAULT_HEIGHT,
         val width: Dp = DEFAULT_WIDTH,
-        val corner: Dp = DEFAULT_CORNER
+        val corner: Dp = DEFAULT_CORNER,
+        val offsetX: Dp = DEFAULT_OFFSET_X,
+        val offsetY: Dp = DEFAULT_OFFSET_Y,
     )
 }
 
