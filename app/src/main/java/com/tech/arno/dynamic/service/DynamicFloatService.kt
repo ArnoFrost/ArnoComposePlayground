@@ -21,7 +21,7 @@ class DynamicFloatService : Service() {
         startMyOwnForeground()
         dynamicWindow = DynamicWindow(this).apply {
             init()
-//            showWindow()
+            showWindow()
         }
     }
 

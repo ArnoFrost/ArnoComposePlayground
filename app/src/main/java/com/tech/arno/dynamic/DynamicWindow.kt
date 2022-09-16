@@ -21,8 +21,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
+import androidx.savedstate.R
+import androidx.savedstate.SavedStateRegistryOwner
 //import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import com.tech.arno.dynamic.service.FloatWindowLifecycleOwner
+import com.tech.arno.util.ReflectionUtils
 
 class DynamicWindow(var context: Context) {
     private lateinit var windowManager: WindowManager
@@ -161,6 +164,18 @@ class DynamicWindow(var context: Context) {
         ViewTreeLifecycleOwner.set(view, lifecycleOwner)
         ViewTreeViewModelStoreOwner.set(view) { viewModelStore }
         //FIXME 引用不到？
-//        ViewTreeSavedStateRegistryOwner.set(view, lifecycleOwner)
+        //        ViewTreeSavedStateRegistryOwner.set(view, lifecycleOwner)
+
+//        val viewTreeSavedStateRegistryOwner =
+//            Class.forName("androidx.savedstate.ViewTreeSavedStateRegistryOwner")
+//        ReflectionUtils.invokeMethod(
+//            viewTreeSavedStateRegistryOwner,
+//            "set",
+//            arrayOf(View::class.java, SavedStateRegistryOwner::class.java),
+//            arrayOf(view, lifecycleOwner)
+//        )
+
+        //FIXME Hack
+        view.setTag(R.id.view_tree_saved_state_registry_owner, lifecycleOwner)
     }
 }
