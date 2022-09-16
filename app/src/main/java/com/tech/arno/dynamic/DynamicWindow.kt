@@ -9,27 +9,10 @@ import android.graphics.PixelFormat
 import android.os.Handler
 import android.provider.Settings
 import android.view.Gravity
-import android.view.View
 import android.view.WindowManager
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.runtime.*
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewTreeLifecycleOwner
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.R
-import com.tech.arno.dynamic.config.DynamicConfig
-import com.tech.arno.dynamic.config.DynamicDirection
-import com.tech.arno.dynamic.config.DynamicType
-//import androidx.savedstate.ViewTreeSavedStateRegistryOwner
-import com.tech.arno.dynamic.service.FloatWindowLifecycleOwner
-import com.tech.arno.dynamic.ui.DynamicConfigViewModel
 import com.tech.arno.dynamic.ui.DynamicConfigViewModelInterface
-import com.tech.arno.dynamic.ui.DynamicFloatScreen
 import com.tech.arno.dynamic.ui.DynamicFloatViewModel
 
 class DynamicWindow(var context: Context) {
@@ -42,7 +25,25 @@ class DynamicWindow(var context: Context) {
     private lateinit var handler: Handler
 
     private var receiver: MyReceiver? = null
-    private var floatingView: ComposeView? = null
+    private val floatingView: ComposeView by lazy {
+        ComposeView(context).apply {
+            // Dispose of the Composition when the view's LifecycleOwner
+            // is destroyed
+//            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+//                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
+//                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
+//                val width = floatingViewModel.width.collectAsState(initial = 24F)
+//                val height = floatingViewModel.height.collectAsState(initial = 24F)
+//                LaunchedEffect(x, y) {
+//                    windowManager.updateViewLayout(floatingView, layoutParams);
+//                }
+//                DynamicFloatScreen(floatingViewModel)
+                PreviewDynamicIsland()
+
+            }
+        }
+    }
 
 
     // 用来判断floatingView是否attached 到 window manager，防止二次removeView导致崩溃
@@ -66,46 +67,21 @@ class DynamicWindow(var context: Context) {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
             width = WindowManager.LayoutParams.WRAP_CONTENT
             height = WindowManager.LayoutParams.WRAP_CONTENT
-//            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
-//            y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
-
-            x = 30
+            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
             y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
         }
-
-        // region init ComposeView
-
-        floatingView = ComposeView(context).apply {
-            // Dispose of the Composition when the view's LifecycleOwner
-            // is destroyed
-//            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-
-            initLifecycleOwner(this)
-            setContent {
-//                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
-//                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
-//                val width = floatingViewModel.width.collectAsState(initial = 24F)
-//                val height = floatingViewModel.height.collectAsState(initial = 24F)
-//                LaunchedEffect(x, y) {
-//                    windowManager.updateViewLayout(floatingView, layoutParams);
-//                }
-//                DynamicFloatScreen(floatingViewModel)
-                PreviewDynamicIsland()
-
-            }
-        }
-        //endregion
     }
 
     fun showWindow() {
         if (Settings.canDrawOverlays(context)) {
+            floatingView.addToLifecycle()
             windowManager.addView(floatingView, layoutParams)
             attached = true
         }
     }
 
     fun destroy() {
-        floatingView?.let { composeView ->
+        floatingView.let { composeView ->
             ViewTreeLifecycleOwner.set(composeView, null)
         }
         // 注销广播并删除浮窗
@@ -124,31 +100,5 @@ class DynamicWindow(var context: Context) {
 //            message.obj = stringBuilder.toString()
 //            handler.sendMessage(message)
         }
-    }
-
-    // Trick The ComposeView into thinking we are tracking lifecycle
-    private fun initLifecycleOwner(view: View) {
-        val viewModelStore = ViewModelStore()
-        val lifecycleOwner = FloatWindowLifecycleOwner().apply {
-            performRestore(null)
-            handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-        }
-
-        ViewTreeLifecycleOwner.set(view, lifecycleOwner)
-        ViewTreeViewModelStoreOwner.set(view) { viewModelStore }
-        //FIXME 引用不到？
-        //        ViewTreeSavedStateRegistryOwner.set(view, lifecycleOwner)
-
-//        val viewTreeSavedStateRegistryOwner =
-//            Class.forName("androidx.savedstate.ViewTreeSavedStateRegistryOwner")
-//        ReflectionUtils.invokeMethod(
-//            viewTreeSavedStateRegistryOwner,
-//            "set",
-//            arrayOf(View::class.java, SavedStateRegistryOwner::class.java),
-//            arrayOf(view, lifecycleOwner)
-//        )
-
-        //FIXME Hack
-        view.setTag(R.id.view_tree_saved_state_registry_owner, lifecycleOwner)
     }
 }

@@ -8,10 +8,10 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 
 /**
- * 自定义LifecycleOwner
+ * Compose自定义LifecycleOwner
  *
  */
-class FloatWindowLifecycleOwner : SavedStateRegistryOwner {
+class ComposeViewLifecycleOwner : SavedStateRegistryOwner {
 
     private var lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(this)
     private var savedStateRegistryController: SavedStateRegistryController =
