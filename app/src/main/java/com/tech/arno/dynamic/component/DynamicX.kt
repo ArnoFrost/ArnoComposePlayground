@@ -8,7 +8,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
-import androidx.savedstate.R
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.tech.arno.dynamic.config.DynamicType
 import com.tech.arno.dynamic.service.ComposeViewLifecycleOwner
@@ -23,7 +22,8 @@ import kotlinx.coroutines.launch
 fun DynamicType.nextType(): DynamicType = when (this) {
     DynamicType.Line -> DynamicType.Card
     DynamicType.Card -> DynamicType.Big
-    DynamicType.Big -> DynamicType.Line
+    DynamicType.Big -> DynamicType.Battery
+    DynamicType.Battery -> DynamicType.Line
 }
 
 // Trick The ComposeView into thinking we are tracking lifecycle

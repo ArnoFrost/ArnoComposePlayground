@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,14 +14,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.tech.arno.dynamic.component.AutoBigRoundIsland
-import com.tech.arno.dynamic.component.AutoCardRoundIsland
-import com.tech.arno.dynamic.component.AutoDynamicIsland
-import com.tech.arno.dynamic.component.AutoLineRoundIsland
+import com.tech.arno.dynamic.component.*
 import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicDirection
+import com.tech.arno.dynamic.config.DynamicMessage
 import com.tech.arno.dynamic.config.DynamicType
-import com.tech.arno.dynamic.component.nextType
 
 @Preview(showBackground = true)
 @Composable
@@ -36,6 +35,7 @@ fun PreviewDemo() {
         var isExpanded by remember { mutableStateOf(false) }
         var islandType by remember { mutableStateOf<DynamicType>(DynamicType.Line) }
         val triggerDynamic = { isExpanded = !isExpanded }
+        val message by remember { mutableStateOf(DynamicMessage("测试消息", "这是测试长文本", 1)) }
         val screenWith = LocalConfiguration.current.screenWidthDp
         val scrollState = rememberScrollState()
 
@@ -68,7 +68,7 @@ fun PreviewDemo() {
             defaultConfig = defaultConfig.value,
             onIslandClick = triggerDynamic
         ) {
-            DynamicContentScreen(islandType)
+            DynamicContentScreen(islandType, message)
         }
         Spacer(Modifier.height(40.dp))
         //测试按钮
@@ -93,6 +93,13 @@ fun PreviewDemo() {
                     triggerDynamic.invoke()
                 }) {
                 Text("扩展")
+            }
+            Button(
+                onClick = {
+                    islandType = DynamicType.Battery
+                    triggerDynamic.invoke()
+                }) {
+                Text("电量")
             }
         }
         Spacer(Modifier.height(16.dp))
@@ -209,6 +216,8 @@ fun PreviewDynamicIsland() {
             DynamicType.Big
         )
     }
+    val message by remember { mutableStateOf(DynamicMessage("测试消息", "这是测试长文本", 1)) }
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -226,97 +235,8 @@ fun PreviewDynamicIsland() {
                     islandType = islandType.nextType()
                 }
             }) {
-            DynamicContentScreen(islandType)
+            DynamicContentScreen(islandType, message)
         }
     }
 }
 
-/**
- * 演示用动态切换效果
- *
- * @param type
- */
-@Composable
-fun DynamicContentScreen(type: DynamicType) {
-    when (type) {
-        DynamicType.Line -> {
-            Text(
-                "简短通知🏝️", fontSize = 14.sp, color = Color.White
-            )
-        }
-        DynamicType.Card -> {
-            Column(verticalArrangement = Arrangement.Center) {
-                Text(
-                    "卡片通知🏝️️", fontSize = 16.sp, color = Color.White
-                )
-            }
-        }
-        DynamicType.Big -> {
-            Column(verticalArrangement = Arrangement.Center) {
-                Text(
-                    "扩展通知🏝️", fontSize = 16.sp, color = Color.White
-                )
-            }
-        }
-    }
-}
-
-/**
- * 预览效果测试
- *
- */
-@Preview(showBackground = true)
-@Composable
-fun PreviewSingleDynamicIsland() {
-
-    var isLineExpanded by remember { mutableStateOf(false) }
-    var isCardExpanded by remember { mutableStateOf(false) }
-    var isBigExpanded by remember { mutableStateOf(false) }
-    val aniDuration = 1500L
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("条幅通知")
-        Spacer(Modifier.height(16.dp))
-        AutoLineRoundIsland(
-            isExpanded = isLineExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isLineExpanded = !isLineExpanded }) {
-            Text(
-                text = "条幅岛🏝️", color = Color.White, fontSize = 14.sp
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text("卡片通知")
-        Spacer(Modifier.height(16.dp))
-        AutoCardRoundIsland(
-            isExpanded = isCardExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isCardExpanded = !isCardExpanded }) {
-            Text(
-                text = "卡片岛🏝️", color = Color.White, fontSize = 16.sp
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text("扩展通知")
-        Spacer(Modifier.height(16.dp))
-        AutoBigRoundIsland(
-            isExpanded = isBigExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isBigExpanded = !isBigExpanded }) {
-            Text(
-                text = "扩展岛🏝️", color = Color.White, fontSize = 16.sp
-            )
-        }
-    }
-}

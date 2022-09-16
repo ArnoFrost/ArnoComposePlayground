@@ -7,6 +7,11 @@ class DynamicConst {
         const val DEFAULT_ANIMATION_DURATION = 500L
         const val DEFAULT_AUTO_CLOSE_INTERVAL = 3000L
 
+        const val ACTION_BATTERY = "com.arno.tech.dynamic.ACTION_POWER"
+        const val ACTION_DEMO_LINE = "com.arno.tech.dynamic.ACTION_DEMO_LINE"
+        const val ACTION_DEMO_CARD = "com.arno.tech.dynamic.ACTION_DEMO_CARD"
+        const val ACTION_DEMO_BIG = "com.arno.tech.dynamic.ACTION_DEMO_BIG"
+
         //默认尺寸
         var DEFAULT_WIDTH = 24.dp
         var DEFAULT_HEIGHT = 24.dp
@@ -28,6 +33,11 @@ class DynamicConst {
         val BIG_WIDTH_MARGIN = 30.dp
         val BIG_HEIGHT = 150.dp
         val BIG_CORNER = 24.dp
+
+        //电量尺寸
+        val POWER_WIDTH_MARGIN = 30.dp
+        val POWER_HEIGHT = 100.dp
+        val POWER_CORNER = 24.dp
     }
 }
 

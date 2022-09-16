@@ -8,4 +8,5 @@ sealed class DynamicType {
     object Line : DynamicType()
     object Card : DynamicType()
     object Big : DynamicType()
+    object Battery : DynamicType()
 }

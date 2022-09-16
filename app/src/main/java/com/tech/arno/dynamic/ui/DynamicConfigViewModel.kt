@@ -3,6 +3,7 @@ package com.tech.arno.dynamic.ui
 import androidx.lifecycle.ViewModel
 import com.tech.arno.dynamic.component.DynamicWindow
 import com.tech.arno.dynamic.config.DynamicDirection
+import com.tech.arno.dynamic.config.DynamicMessage
 import com.tech.arno.dynamic.config.DynamicType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ interface DynamicConfigViewModelInterface {
     val isExpanded: Flow<Boolean>
 
     val isLandType: Flow<DynamicType>
+    val isLandMessage: Flow<DynamicMessage>
 
     //region config
     val offsetX: Flow<Float>
@@ -45,6 +47,7 @@ interface DynamicConfigViewModelInterface {
     fun sendLineType()
     fun sendCardType()
     fun sendBigType()
+    fun sendBattery(value: Int)
 }
 
 open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface {
@@ -82,6 +85,11 @@ open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface 
     protected val _isLandType: MutableStateFlow<DynamicType> = MutableStateFlow(DynamicType.Line)
     override val isLandType: Flow<DynamicType>
         get() = _isLandType.asStateFlow()
+
+    protected val _isLandMessage: MutableStateFlow<DynamicMessage> =
+        MutableStateFlow(DynamicMessage("测试标题", "测试文本", 2))
+    override val isLandMessage: Flow<DynamicMessage>
+        get() = _isLandMessage.asStateFlow()
 
 
     protected val _offsetX = MutableStateFlow(0F)
@@ -145,6 +153,11 @@ open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface 
         _isLandType.update { DynamicType.Big }
         triggerDynamic()
     }
+
+    override fun sendBattery(value: Int) {
+        _isLandType.update { DynamicType.Battery }
+        triggerDynamic()
+    }
 }
 
 class DynamicActivityViewModel : DynamicFloatViewModel() {
@@ -194,9 +207,13 @@ class DynamicActivityViewModel : DynamicFloatViewModel() {
         delegateViewModel?.sendBigType()
     }
 
+    override fun sendBattery(value: Int) {
+        delegateViewModel?.sendBattery(value)
+    }
+
     fun injectFloatViewModel() {
         delegateViewModel =
-            DynamicViewModelDelegate((DynamicWindow.floatingViewModel) as DynamicFloatViewModel)
+            DynamicViewModelDelegate((DynamicWindow.viewModel) as DynamicFloatViewModel)
 
     }
 }

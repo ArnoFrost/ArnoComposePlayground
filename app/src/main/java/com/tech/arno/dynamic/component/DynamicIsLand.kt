@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 /**
  * 混合类型岛屿🏝️
  *
- * @param type [DynamicType.Line] [DynamicType.Card] [DynamicType.Big]
+ * @param type [DynamicType]
  * @param isExpanded [Boolean] 是否展开
  * @param aniDuration [Long] 展开动画时长
  * @param direction [DynamicDirection] 展开方向
@@ -56,7 +56,7 @@ fun AutoDynamicIsland(
 ) {
     //region 初始设定
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val targetConfig by remember(type) { mutableStateOf(gettargetConfigByType(type, screenWidth)) }
+    val targetConfig by remember(type) { mutableStateOf(getTargetConfigByType(type, screenWidth)) }
     //endregion
 
     BasicAutoDynamicIsland(
@@ -326,7 +326,7 @@ inline fun AutoBigRoundIsland(
  * @param screenWidthDp
  * @return
  */
-private fun gettargetConfigByType(
+private fun getTargetConfigByType(
     type: DynamicType,
     screenWidthDp: Dp
 ): DynamicConfig {
@@ -352,6 +352,11 @@ private fun gettargetConfigByType(
                 corner = DynamicConst.BIG_CORNER,
             )
         }
+        DynamicType.Battery -> DynamicConfig(
+            height = DynamicConst.POWER_HEIGHT,
+            width = screenWidthDp - DynamicConst.POWER_WIDTH_MARGIN,
+            corner = DynamicConst.POWER_CORNER,
+        )
     }
 }
 

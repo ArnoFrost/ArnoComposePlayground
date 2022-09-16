@@ -16,11 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.tech.arno.dynamic.component.AutoDynamicIsland
-import com.tech.arno.dynamic.config.DynamicConst
-import com.tech.arno.dynamic.demo.DynamicContentScreen
-import com.tech.arno.dynamic.config.DynamicConfig
-import com.tech.arno.dynamic.config.DynamicDirection
-import com.tech.arno.dynamic.config.DynamicType
+import com.tech.arno.dynamic.component.DynamicContentScreen
+import com.tech.arno.dynamic.config.*
 
 
 @Composable
@@ -178,6 +175,7 @@ fun DynamicFloatScreen(
     direction: DynamicDirection = DynamicDirection.Center,
     autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
+    message: DynamicMessage,
     defaultConfig: DynamicConfig = DynamicConfig(
         height = DynamicConst.DEFAULT_HEIGHT,
         width = DynamicConst.DEFAULT_WIDTH,
@@ -195,7 +193,7 @@ fun DynamicFloatScreen(
         onIslandClick = onIslandClick,
         finishListener = finishListener
     ) {
-        DynamicContentScreen(type)
+        DynamicContentScreen(type, message)
     }
 }
 
@@ -215,6 +213,8 @@ fun DynamicFloatScreen(viewModel: DynamicConfigViewModelInterface) {
     val isExpanded = viewModel.isExpanded.collectAsState(initial = false)
 
     val islandType = viewModel.isLandType.collectAsState(initial = DynamicType.Line)
+    val islandMessage =
+        viewModel.isLandMessage.collectAsState(initial = DynamicMessage("测试标题", "测试文本", 2))
 
     val dynamicDefaultOffSetX = viewModel.offsetX.collectAsState(initial = 0F)
     val dynamicDefaultOffSetY = viewModel.offsetY.collectAsState(initial = 0F)
@@ -246,6 +246,6 @@ fun DynamicFloatScreen(viewModel: DynamicConfigViewModelInterface) {
             viewModel.triggerDynamic()
         }
     ) {
-        DynamicContentScreen(islandType.value)
+        DynamicContentScreen(islandType.value, islandMessage.value)
     }
 }

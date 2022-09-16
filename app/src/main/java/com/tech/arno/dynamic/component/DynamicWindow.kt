@@ -21,7 +21,7 @@ import com.tech.arno.dynamic.ui.DynamicFloatViewModel
 
 class DynamicWindow(var context: Context) {
     companion object {
-        val floatingViewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
+        val viewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
     }
 
     private lateinit var handler: Handler
@@ -53,14 +53,14 @@ class DynamicWindow(var context: Context) {
 //            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
                 //位置偏移
-                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
-                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
+                val x = viewModel.offsetX.collectAsState(initial = 0F)
+                val y = viewModel.offsetY.collectAsState(initial = 0F)
                 windowLayoutParams.apply {
                     this.x = x.value.toInt()
                     this.y = y.value.toInt()
                 }
                 windowManager.updateViewLayout(floatingView, windowLayoutParams)
-                DynamicFloatScreen(floatingViewModel)
+                DynamicFloatScreen(viewModel)
             }
         }
     }
@@ -72,7 +72,13 @@ class DynamicWindow(var context: Context) {
         // 注册广播
         receiver = MyReceiver()
         val filter = IntentFilter()
-        filter.addAction("android.intent.action.MyReceiver")
+        filter.addAction(DynamicConst.ACTION_DEMO_LINE)
+        filter.addAction(DynamicConst.ACTION_DEMO_CARD)
+        filter.addAction(DynamicConst.ACTION_DEMO_BIG)
+
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED)
+        filter.addAction(DynamicConst.ACTION_BATTERY)
+
         context.registerReceiver(receiver, filter);
 
         // 获取windowManager并设置layoutParams
@@ -101,11 +107,16 @@ class DynamicWindow(var context: Context) {
 
     inner class MyReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-//            val content = intent.getStringExtra("content") ?: ""
-//            val message = Message.obtain()
-//            message.what = 0
-//            message.obj = stringBuilder.toString()
-//            handler.sendMessage(message)
+            when (intent.action) {
+                DynamicConst.ACTION_BATTERY -> {
+                    val level = intent.getIntExtra("level", 66)
+                    viewModel.sendBattery(level)
+                }
+                Intent.ACTION_BATTERY_CHANGED -> {
+                    val level = intent.getIntExtra("level", 0)
+                    viewModel.sendBattery(level)
+                }
+            }
         }
     }
 }
