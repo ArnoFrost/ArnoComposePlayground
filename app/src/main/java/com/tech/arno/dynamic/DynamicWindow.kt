@@ -33,16 +33,17 @@ import com.tech.arno.dynamic.ui.DynamicFloatScreen
 import com.tech.arno.dynamic.ui.DynamicFloatViewModel
 
 class DynamicWindow(var context: Context) {
+    companion object {
+        val floatingViewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
+    }
+
     private lateinit var windowManager: WindowManager
     private lateinit var layoutParams: WindowManager.LayoutParams
     private lateinit var handler: Handler
 
     private var receiver: MyReceiver? = null
     private var floatingView: ComposeView? = null
-    val floatingViewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
 
-    private var x = 0
-    private var y = 0
 
     // 用来判断floatingView是否attached 到 window manager，防止二次removeView导致崩溃
     private var attached = false
@@ -62,10 +63,13 @@ class DynamicWindow(var context: Context) {
 //            format = PixelFormat.TRANSPARENT
             gravity = Gravity.START or Gravity.TOP
             flags =
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
             width = WindowManager.LayoutParams.WRAP_CONTENT
             height = WindowManager.LayoutParams.WRAP_CONTENT
-            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
+//            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
+//            y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
+
+            x = 30
             y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
         }
 
@@ -74,13 +78,21 @@ class DynamicWindow(var context: Context) {
         floatingView = ComposeView(context).apply {
             // Dispose of the Composition when the view's LifecycleOwner
             // is destroyed
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+//            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+            initLifecycleOwner(this)
             setContent {
-                DynamicFloatScreen(floatingViewModel)
+//                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
+//                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
+//                val width = floatingViewModel.width.collectAsState(initial = 24F)
+//                val height = floatingViewModel.height.collectAsState(initial = 24F)
+//                LaunchedEffect(x, y) {
+//                    windowManager.updateViewLayout(floatingView, layoutParams);
+//                }
+//                DynamicFloatScreen(floatingViewModel)
+                PreviewDynamicIsland()
+
             }
-        }
-        floatingView?.let { composeView ->
-            initLifecycleOwner(composeView)
         }
         //endregion
     }

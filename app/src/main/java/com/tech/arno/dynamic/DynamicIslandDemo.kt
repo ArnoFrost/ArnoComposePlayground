@@ -198,10 +198,10 @@ fun PreviewDemo() {
 @Composable
 fun PreviewDynamicIsland() {
     val aniDuration = 1500L
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(true) }
     var islandType by remember {
         mutableStateOf<DynamicType>(
-            DynamicType.Line
+            DynamicType.Big
         )
     }
     Column(

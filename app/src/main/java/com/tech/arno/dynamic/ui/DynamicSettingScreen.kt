@@ -104,7 +104,7 @@ fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
                 })
         }
         OutlinedTextField(
-            value = dynamicDefaultOffSetX.toString(),
+            value = dynamicDefaultOffSetX.value.toString(),
             onValueChange = { value ->
                 val result = if (value.toFloatOrNull() != null) {
                     value.toFloat()
@@ -132,7 +132,7 @@ fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
                 })
         }
         OutlinedTextField(
-            value = dynamicDefaultOffSetY.toString(),
+            value = dynamicDefaultOffSetY.value.toString(),
             onValueChange = { value ->
                 val result = if (value.toFloatOrNull() != null) {
                     value.toFloat()
@@ -257,17 +257,19 @@ fun DynamicFloatScreen(viewModel: DynamicConfigViewModelInterface) {
             )
         }
     }
-    val screenWith = LocalConfiguration.current.screenWidthDp
-    val scrollState = rememberScrollState()
     //endregion
 
     AutoDynamicIsland(
         type = islandType.value,
-        aniDuration = aniDuration.value,
         isExpanded = isExpanded.value,
-        autoClose = true,
-        onIslandClick = { viewModel.triggerDynamic() },
-        finishListener = {}
+        direction = direction.value,
+        aniDuration = aniDuration.value,
+        autoClose = autoClose.value,
+        autoCloseInterval = autoCloseInterval.value,
+        defaultConfig = defaultConfig.value,
+        onIslandClick = {
+            viewModel.triggerDynamic()
+        }
     ) {
         DynamicContentScreen(islandType.value)
     }

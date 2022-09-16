@@ -23,13 +23,15 @@ class DynamicConfigActivity : ComponentActivity() {
                 Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
-                checkOverlayPermission()
-                startService()
                 DynamicSettingScreen(viewModel)
+                DynamicFloatScreen(viewModel )
             }
         }
+        viewModel.injectFloatViewModel()
+        checkOverlayPermission()
+        startService()
     }
 
     // method to ask user to grant the Overlay permission
