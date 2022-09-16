@@ -1,7 +1,6 @@
 package com.tech.arno.dynamic.config
 
 import androidx.compose.ui.unit.Dp
-import com.tech.arno.dynamic.DynamicConst
 
 
 /**

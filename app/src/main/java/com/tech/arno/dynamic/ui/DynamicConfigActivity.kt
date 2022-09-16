@@ -18,6 +18,8 @@ class DynamicConfigActivity : ComponentActivity() {
     private val viewModel: DynamicActivityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkOverlayPermission()
+
         setContent {
             Column(
                 Modifier
@@ -37,8 +39,6 @@ class DynamicConfigActivity : ComponentActivity() {
             }
         }
         viewModel.injectFloatViewModel()
-        checkOverlayPermission()
-        startService()
     }
 
     // method to ask user to grant the Overlay permission

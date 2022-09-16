@@ -1,38 +1,58 @@
 package com.tech.arno.dynamic.service
 
 import android.accessibilityservice.AccessibilityService
-import android.graphics.PixelFormat
-import android.view.Gravity
-import android.view.WindowManager
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.view.accessibility.AccessibilityEvent
+import androidx.core.app.NotificationCompat
+import com.tech.arno.R
+import com.tech.arno.dynamic.component.DynamicWindow
 
 class DynamicAccessibilityService : AccessibilityService() {
+    private var dynamicWindow: DynamicWindow? = null
+
+    override fun onCreate() {
+        startMyOwnForeground()
+        dynamicWindow = DynamicWindow(this).apply {
+            init()
+            showWindow()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        dynamicWindow?.destroy()
+    }
+
+    private fun startMyOwnForeground() {
+        val NOTIFICATION_CHANNEL_ID = "com.arno.tech"
+        val channelName = "Background Service"
+        val chan = NotificationChannel(
+            NOTIFICATION_CHANNEL_ID,
+            channelName,
+            NotificationManager.IMPORTANCE_MIN
+        )
+        val manager = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
+        manager.createNotificationChannel(chan)
+        val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        val notification = notificationBuilder.setOngoing(true)
+            .setContentTitle("Service running")
+            .setContentText("Displaying over other apps") // this is important, otherwise the notification will show the way
+            // you want i.e. it will show some default notification
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setPriority(NotificationManager.IMPORTANCE_MIN)
+            .setCategory(Notification.CATEGORY_SERVICE)
+            .build()
+        startForeground(2, notification)
+    }
+
+
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
 
     }
 
     override fun onInterrupt() {
 
-    }
-
-    private lateinit var windowManager: WindowManager
-    private lateinit var layoutParams: WindowManager.LayoutParams
-    override fun onCreate() {
-        // 获取WindowManager
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
-        layoutParams = WindowManager.LayoutParams().apply {
-            // 实现在其他应用和窗口上方显示浮窗
-            type =
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            format = PixelFormat.RGBA_8888
-            // 设置浮窗的大小和位置
-            gravity = Gravity.START or Gravity.TOP
-            flags =
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-            width = 600
-            height = 600
-            x = 300
-            y = 300
-        }
     }
 }

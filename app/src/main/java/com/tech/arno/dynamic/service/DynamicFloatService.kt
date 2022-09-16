@@ -3,15 +3,10 @@ package com.tech.arno.dynamic.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Intent
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
-import androidx.savedstate.SavedStateRegistry
-import androidx.savedstate.SavedStateRegistryController
-import androidx.savedstate.SavedStateRegistryOwner
 import com.tech.arno.R
-import com.tech.arno.dynamic.DynamicWindow
+import com.tech.arno.dynamic.component.DynamicWindow
 
 class DynamicFloatService : LifecycleService() {
     private var dynamicWindow: DynamicWindow? = null

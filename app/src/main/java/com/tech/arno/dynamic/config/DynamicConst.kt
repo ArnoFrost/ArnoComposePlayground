@@ -1,4 +1,4 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.config
 
 import androidx.compose.ui.unit.dp
 

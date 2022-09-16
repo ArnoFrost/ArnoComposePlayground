@@ -1,4 +1,4 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.component
 
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -6,14 +6,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.PixelFormat
+import android.os.Build
 import android.os.Handler
 import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import com.tech.arno.dynamic.config.DynamicConst
 import com.tech.arno.dynamic.ui.DynamicConfigViewModelInterface
 import com.tech.arno.dynamic.ui.DynamicFloatScreen
 import com.tech.arno.dynamic.ui.DynamicFloatViewModel
@@ -23,11 +24,28 @@ class DynamicWindow(var context: Context) {
         val floatingViewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
     }
 
-    private lateinit var windowManager: WindowManager
-    private lateinit var windowLayoutParams: WindowManager.LayoutParams
     private lateinit var handler: Handler
-
+    private lateinit var windowManager: WindowManager
     private var receiver: MyReceiver? = null
+    private val windowLayoutParams: WindowManager.LayoutParams by lazy {
+        WindowManager.LayoutParams().apply {
+            type =
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            format = PixelFormat.RGBA_8888
+//            format = PixelFormat.TRANSPARENT
+            gravity = Gravity.START or Gravity.TOP
+            flags =
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
+            width = WindowManager.LayoutParams.WRAP_CONTENT
+            height = WindowManager.LayoutParams.WRAP_CONTENT
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                layoutInDisplayCutoutMode =
+                    WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_ALWAYS
+            }
+            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
+            y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
+        }
+    }
     private val floatingView: ComposeView by lazy {
         ComposeView(context).apply {
             // Dispose of the Composition when the view's LifecycleOwner
@@ -59,19 +77,6 @@ class DynamicWindow(var context: Context) {
 
         // 获取windowManager并设置layoutParams
         windowManager = context.getSystemService(Service.WINDOW_SERVICE) as WindowManager
-        windowLayoutParams = WindowManager.LayoutParams().apply {
-            type =
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
-            format = PixelFormat.RGBA_8888
-//            format = PixelFormat.TRANSPARENT
-            gravity = Gravity.START or Gravity.TOP
-            flags =
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN
-            width = WindowManager.LayoutParams.WRAP_CONTENT
-            height = WindowManager.LayoutParams.WRAP_CONTENT
-            x = DynamicConst.DEFAULT_OFFSET_X.value.toInt()
-            y = DynamicConst.DEFAULT_OFFSET_Y.value.toInt()
-        }
     }
 
     fun showWindow() {

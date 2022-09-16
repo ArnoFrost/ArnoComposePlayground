@@ -1,4 +1,4 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.component
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tech.arno.dynamic.config.DynamicConfig
+import com.tech.arno.dynamic.config.DynamicConst
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicType
 import kotlinx.coroutines.delay

@@ -1,4 +1,4 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.component
 
 import androidx.compose.runtime.Recomposer
 import androidx.compose.ui.platform.AbstractComposeView

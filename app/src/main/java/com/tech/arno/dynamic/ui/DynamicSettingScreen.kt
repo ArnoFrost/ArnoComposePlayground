@@ -15,9 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.tech.arno.dynamic.AutoDynamicIsland
-import com.tech.arno.dynamic.DynamicConst
-import com.tech.arno.dynamic.DynamicContentScreen
+import com.tech.arno.dynamic.component.AutoDynamicIsland
+import com.tech.arno.dynamic.config.DynamicConst
+import com.tech.arno.dynamic.demo.DynamicContentScreen
 import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicType

@@ -1,7 +1,7 @@
 package com.tech.arno.dynamic.ui
 
 import androidx.lifecycle.ViewModel
-import com.tech.arno.dynamic.DynamicWindow
+import com.tech.arno.dynamic.component.DynamicWindow
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicType
 import kotlinx.coroutines.flow.Flow

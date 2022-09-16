@@ -1,4 +1,4 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.demo
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,9 +12,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.tech.arno.dynamic.component.AutoBigRoundIsland
+import com.tech.arno.dynamic.component.AutoCardRoundIsland
+import com.tech.arno.dynamic.component.AutoDynamicIsland
+import com.tech.arno.dynamic.component.AutoLineRoundIsland
 import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicType
+import com.tech.arno.dynamic.component.nextType
 
 @Preview(showBackground = true)
 @Composable
