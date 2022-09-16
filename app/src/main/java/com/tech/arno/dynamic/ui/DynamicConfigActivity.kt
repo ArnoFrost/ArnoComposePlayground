@@ -26,7 +26,14 @@ class DynamicConfigActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.Start
             ) {
                 DynamicSettingScreen(viewModel)
-                DynamicFloatScreen(viewModel )
+//                val x = DynamicWindow.floatingViewModel.offsetX.collectAsState(initial = 0F)
+//                val y = DynamicWindow.floatingViewModel.offsetY.collectAsState(initial = 0F)
+//                Box(
+//                    Modifier
+//                        .offset(x.value.dp, y.value.dp)
+//                        .fillMaxHeight()) {
+//                    DynamicFloatScreen(viewModel)
+//                }
             }
         }
         viewModel.injectFloatViewModel()

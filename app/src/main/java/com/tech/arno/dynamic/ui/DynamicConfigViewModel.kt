@@ -47,7 +47,7 @@ interface DynamicConfigViewModelInterface {
     fun sendBigType()
 }
 
-open class DynamicFloatViewModel : DynamicConfigViewModelInterface {
+open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface {
 //    companion object {
 //        val composeViewModel by lazy {
 //            object : DynamicConfigViewModelInterface {
@@ -75,7 +75,7 @@ open class DynamicFloatViewModel : DynamicConfigViewModelInterface {
     override val direction: Flow<DynamicDirection>
         get() = _direction.asStateFlow()
 
-    protected val _isExpanded = MutableStateFlow(true)
+    protected val _isExpanded = MutableStateFlow(false)
     override val isExpanded: Flow<Boolean>
         get() = _isExpanded.asStateFlow()
 
@@ -147,54 +147,8 @@ open class DynamicFloatViewModel : DynamicConfigViewModelInterface {
     }
 }
 
-class DynamicActivityViewModel : ViewModel(), DynamicConfigViewModelInterface {
-    private var delegateViewModel: DynamicFloatViewModel? = null
-    protected val _aniDuration = MutableStateFlow(3000L)
-    override val aniDuration: Flow<Long>
-        get() = _aniDuration.asStateFlow()
-
-    protected val _autoCloseInterval = MutableStateFlow(3000L)
-    override val autoCloseInterval: Flow<Long>
-        get() = _autoCloseInterval.asStateFlow()
-
-    protected val _autoClose = MutableStateFlow(true)
-    override val autoClose: Flow<Boolean>
-        get() = _autoClose.asStateFlow()
-
-    protected val _direction: MutableStateFlow<DynamicDirection> =
-        MutableStateFlow(DynamicDirection.Center)
-    override val direction: Flow<DynamicDirection>
-        get() = _direction.asStateFlow()
-
-    protected val _isExpanded = MutableStateFlow(true)
-    override val isExpanded: Flow<Boolean>
-        get() = _isExpanded.asStateFlow()
-
-    protected val _isLandType: MutableStateFlow<DynamicType> = MutableStateFlow(DynamicType.Line)
-    override val isLandType: Flow<DynamicType>
-        get() = _isLandType.asStateFlow()
-
-
-    protected val _offsetX = MutableStateFlow(0F)
-    override val offsetX: Flow<Float>
-        get() = _offsetX.asStateFlow()
-
-    protected val _offsetY = MutableStateFlow(0F)
-    override val offsetY: Flow<Float>
-        get() = _offsetY.asStateFlow()
-
-    protected val _width = MutableStateFlow(24F)
-    override val width: Flow<Float>
-        get() = _width.asStateFlow()
-
-    protected val _height = MutableStateFlow(24F)
-    override val height: Flow<Float>
-        get() = _height.asStateFlow()
-
-    protected val _corner = MutableStateFlow(24F)
-    override val corner: Flow<Float>
-        get() = _corner.asStateFlow()
-
+class DynamicActivityViewModel : DynamicFloatViewModel() {
+    private var delegateViewModel: DynamicViewModelDelegate? = null
     override fun triggerDynamic() {
         //相反触发 TODO 队列变更待处理
         _isExpanded.update {
@@ -229,29 +183,24 @@ class DynamicActivityViewModel : ViewModel(), DynamicConfigViewModelInterface {
     }
 
     override fun sendLineType() {
-        _isLandType.update { DynamicType.Line }
-        triggerDynamic()
         delegateViewModel?.sendLineType()
     }
 
     override fun sendCardType() {
-        _isLandType.update { DynamicType.Card }
-        triggerDynamic()
         delegateViewModel?.sendCardType()
     }
 
     override fun sendBigType() {
-        _isLandType.update { DynamicType.Big }
-        triggerDynamic()
         delegateViewModel?.sendBigType()
     }
 
     fun injectFloatViewModel() {
-        delegateViewModel = (DynamicWindow.floatingViewModel) as DynamicFloatViewModel
+        delegateViewModel =
+            DynamicViewModelDelegate((DynamicWindow.floatingViewModel) as DynamicFloatViewModel)
 
     }
 }
 
-class DynamicConfigViewModel(floatViewModel: DynamicConfigViewModelInterface) :
+class DynamicViewModelDelegate(floatViewModel: DynamicConfigViewModelInterface) :
     DynamicConfigViewModelInterface by floatViewModel {
 }

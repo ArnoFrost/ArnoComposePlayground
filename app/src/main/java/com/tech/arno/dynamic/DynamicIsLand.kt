@@ -172,10 +172,8 @@ fun BasicDynamicIsland(
         animationSpec = spring(springSpec)
     )
     val alignment by remember(direction) { mutableStateOf(getAlignmentByDirection(direction)) }
-    val offsetX by remember(defaultConfig) { mutableStateOf(defaultConfig.offsetX) }
-    val offsetY by remember(defaultConfig) { mutableStateOf(defaultConfig.offsetY) }
 
-    Box(Modifier.offset(offsetX, offsetY)) {
+    Box(Modifier.wrapContentSize()) {
         Card(
             modifier = Modifier
                 .height(heightState)

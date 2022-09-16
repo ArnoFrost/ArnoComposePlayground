@@ -26,36 +26,11 @@ import com.tech.arno.dynamic.config.DynamicType
 @Composable
 fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
     //region 配置属性
-    val aniDuration =
-        viewModel.aniDuration.collectAsState(initial = DynamicConst.DEFAULT_ANIMATION_DURATION)
-
-    val autoCloseInterval =
-        viewModel.autoCloseInterval.collectAsState(initial = DynamicConst.DEFAULT_AUTO_CLOSE_INTERVAL)
-
-    val autoClose = viewModel.autoClose.collectAsState(initial = true)
-
-    val direction = viewModel.direction.collectAsState(initial = DynamicDirection.Center)
-
-    val isExpanded = viewModel.isExpanded.collectAsState(initial = false)
-
-    val islandType = viewModel.isLandType.collectAsState(initial = DynamicType.Line)
-
     val dynamicDefaultOffSetX = viewModel.offsetX.collectAsState(initial = 0F)
     val dynamicDefaultOffSetY = viewModel.offsetY.collectAsState(initial = 0F)
     val dynamicDefaultWidth = viewModel.width.collectAsState(initial = 24F)
     val dynamicDefaultHeight = viewModel.height.collectAsState(initial = 24F)
     val dynamicDefaultCorner = viewModel.corner.collectAsState(initial = 24F)
-    val defaultConfig = remember {
-        derivedStateOf {
-            DynamicConfig(
-                dynamicDefaultHeight.value.dp,
-                dynamicDefaultWidth.value.dp,
-                dynamicDefaultCorner.value.dp,
-                dynamicDefaultOffSetX.value.dp,
-                dynamicDefaultOffSetY.value.dp
-            )
-        }
-    }
     val screenWith = LocalConfiguration.current.screenWidthDp
     val scrollState = rememberScrollState()
     //endregion

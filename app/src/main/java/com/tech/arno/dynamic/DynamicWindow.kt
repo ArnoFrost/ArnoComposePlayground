@@ -10,9 +10,12 @@ import android.os.Handler
 import android.provider.Settings
 import android.view.Gravity
 import android.view.WindowManager
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import com.tech.arno.dynamic.ui.DynamicConfigViewModelInterface
+import com.tech.arno.dynamic.ui.DynamicFloatScreen
 import com.tech.arno.dynamic.ui.DynamicFloatViewModel
 
 class DynamicWindow(var context: Context) {
@@ -21,7 +24,7 @@ class DynamicWindow(var context: Context) {
     }
 
     private lateinit var windowManager: WindowManager
-    private lateinit var layoutParams: WindowManager.LayoutParams
+    private lateinit var windowLayoutParams: WindowManager.LayoutParams
     private lateinit var handler: Handler
 
     private var receiver: MyReceiver? = null
@@ -31,16 +34,15 @@ class DynamicWindow(var context: Context) {
             // is destroyed
 //            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-//                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
-//                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
-//                val width = floatingViewModel.width.collectAsState(initial = 24F)
-//                val height = floatingViewModel.height.collectAsState(initial = 24F)
-//                LaunchedEffect(x, y) {
-//                    windowManager.updateViewLayout(floatingView, layoutParams);
-//                }
-//                DynamicFloatScreen(floatingViewModel)
-                PreviewDynamicIsland()
-
+                //位置偏移
+                val x = floatingViewModel.offsetX.collectAsState(initial = 0F)
+                val y = floatingViewModel.offsetY.collectAsState(initial = 0F)
+                windowLayoutParams.apply {
+                    this.x = x.value.toInt()
+                    this.y = y.value.toInt()
+                }
+                windowManager.updateViewLayout(floatingView, windowLayoutParams)
+                DynamicFloatScreen(floatingViewModel)
             }
         }
     }
@@ -57,7 +59,7 @@ class DynamicWindow(var context: Context) {
 
         // 获取windowManager并设置layoutParams
         windowManager = context.getSystemService(Service.WINDOW_SERVICE) as WindowManager
-        layoutParams = WindowManager.LayoutParams().apply {
+        windowLayoutParams = WindowManager.LayoutParams().apply {
             type =
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             format = PixelFormat.RGBA_8888
@@ -75,7 +77,7 @@ class DynamicWindow(var context: Context) {
     fun showWindow() {
         if (Settings.canDrawOverlays(context)) {
             floatingView.addToLifecycle()
-            windowManager.addView(floatingView, layoutParams)
+            windowManager.addView(floatingView, windowLayoutParams)
             attached = true
         }
     }
