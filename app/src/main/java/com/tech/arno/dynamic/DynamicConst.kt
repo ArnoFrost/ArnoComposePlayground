@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.dp
 class DynamicConst {
     companion object {
         const val DEFAULT_ANIMATION_DURATION = 500L
+        const val DEFAULT_AUTO_CLOSE_INTERVAL = 3000L
 
         //默认尺寸
         var DEFAULT_WIDTH = 24.dp

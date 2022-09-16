@@ -29,6 +29,8 @@ import com.tech.arno.dynamic.config.DynamicType
 import com.tech.arno.dynamic.service.FloatWindowLifecycleOwner
 import com.tech.arno.dynamic.ui.DynamicConfigViewModel
 import com.tech.arno.dynamic.ui.DynamicConfigViewModelInterface
+import com.tech.arno.dynamic.ui.DynamicFloatScreen
+import com.tech.arno.dynamic.ui.DynamicFloatViewModel
 
 class DynamicWindow(var context: Context) {
     private lateinit var windowManager: WindowManager
@@ -37,7 +39,7 @@ class DynamicWindow(var context: Context) {
 
     private var receiver: MyReceiver? = null
     private var floatingView: ComposeView? = null
-    val floatingViewModel: DynamicConfigViewModelInterface = DynamicConfigViewModel()
+    val floatingViewModel: DynamicConfigViewModelInterface = DynamicFloatViewModel()
 
     private var x = 0
     private var y = 0
@@ -74,7 +76,7 @@ class DynamicWindow(var context: Context) {
             // is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                DynamicScreen(floatingViewModel)
+                DynamicFloatScreen(floatingViewModel)
             }
         }
         floatingView?.let { composeView ->
@@ -88,52 +90,6 @@ class DynamicWindow(var context: Context) {
             windowManager.addView(floatingView, layoutParams)
             attached = true
         }
-    }
-
-    @Composable
-    private fun DynamicScreen(viewModel: DynamicConfigViewModelInterface) {
-        //region 配置属性
-        val aniDuration = 3000L
-        val autoCloseInterval = 3000L
-        val direction = DynamicDirection.Center
-        var isExpanded by remember { mutableStateOf(false) }
-        var islandType by remember { mutableStateOf<DynamicType>(DynamicType.Line) }
-        val triggerDynamic = { isExpanded = !isExpanded }
-        val screenWith = LocalConfiguration.current.screenWidthDp
-        val scrollState = rememberScrollState()
-
-        var dynamicDefaultOffSetX by remember { mutableStateOf(0F) }
-        var dynamicDefaultOffSetY by remember { mutableStateOf(0F) }
-        var dynamicDefaultWidth by remember { mutableStateOf(24F) }
-        var dynamicDefaultHeight by remember { mutableStateOf(24F) }
-        var dynamicDefaultCorner by remember { mutableStateOf(24F) }
-        val defaultSize = remember {
-            derivedStateOf {
-                DynamicConfig(
-                    dynamicDefaultHeight.dp,
-                    dynamicDefaultWidth.dp,
-                    dynamicDefaultCorner.dp,
-                    dynamicDefaultOffSetX.dp,
-                    dynamicDefaultOffSetY.dp
-                )
-            }
-        }
-        //endregion
-
-        //region UI
-        AutoDynamicIsland(
-            type = islandType,
-            isExpanded = isExpanded,
-            direction = direction,
-            aniDuration = aniDuration,
-            autoClose = true,
-            autoCloseInterval = autoCloseInterval,
-            defaultConfig = defaultSize.value,
-            onIslandClick = triggerDynamic
-        ) {
-            DynamicContentScreen(islandType)
-        }
-        //endregion
     }
 
     fun destroy() {
