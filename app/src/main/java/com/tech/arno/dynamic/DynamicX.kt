@@ -1,5 +1,7 @@
 package com.tech.arno.dynamic
 
+import com.tech.arno.dynamic.config.DynamicType
+
 /**
  * 下一个类型 循环
  *

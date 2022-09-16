@@ -1,29 +1,66 @@
-package com.tech.arno.dynamic
+package com.tech.arno.dynamic.ui
 
+import android.content.Intent
+import android.os.Bundle
+import android.provider.Settings
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.Button
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Slider
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.tech.arno.dynamic.DynamicConst
 import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicType
+import com.tech.arno.dynamic.service.DynamicFloatService
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewDemo() {
-    Column(
-        Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.Start
-    ) {
+class DynamicConfigActivity : ComponentActivity() {
+    private val viewModel: DynamicConfigViewModel by viewModels()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DynamicSettingScreen(viewModel)
+                checkOverlayPermission()
+                startService()
+            }
+        }
+    }
+
+    // method to ask user to grant the Overlay permission
+    private fun checkOverlayPermission() {
+        if (!Settings.canDrawOverlays(this)) {
+            // send user to the device settings
+            startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+        }
+    }
+
+    private fun startService() {
+        // check if the user has already granted
+        // the Draw over other apps permission
+        if (Settings.canDrawOverlays(this)) {
+            // start the service based on the android version
+            startForegroundService(Intent(this, DynamicFloatService::class.java))
+        }
+    }
+
+    @Composable
+    fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
         //region 配置属性
         val aniDuration = 3000L
         val autoCloseInterval = 3000L
@@ -39,7 +76,7 @@ fun PreviewDemo() {
         var dynamicDefaultWidth by remember { mutableStateOf(24F) }
         var dynamicDefaultHeight by remember { mutableStateOf(24F) }
         var dynamicDefaultCorner by remember { mutableStateOf(24F) }
-        val defaultConfig = remember {
+        val defaultSize = remember {
             derivedStateOf {
                 DynamicConfig(
                     dynamicDefaultHeight.dp,
@@ -51,22 +88,8 @@ fun PreviewDemo() {
             }
         }
         //endregion
-        Text("类型: ${islandType.javaClass.simpleName}")
-        Spacer(Modifier.height(16.dp))
-        AutoDynamicIsland(
-            type = islandType,
-            isExpanded = isExpanded,
-            direction = direction,
-            aniDuration = aniDuration,
-            autoClose = true,
-            autoCloseInterval = autoCloseInterval,
-            defaultConfig = defaultConfig.value,
-            onIslandClick = triggerDynamic
-        ) {
-            DynamicContentScreen(islandType)
-        }
-        Spacer(Modifier.height(40.dp))
-        //测试按钮
+
+        // region 测试按钮
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
             Button(
                 onClick = {
@@ -90,8 +113,9 @@ fun PreviewDemo() {
                 Text("扩展")
             }
         }
+        //endregion
         Spacer(Modifier.height(16.dp))
-        //配置信息
+        //region 配置组件
         Column(
             Modifier.verticalScroll(scrollState),
             verticalArrangement = Arrangement.SpaceAround
@@ -189,129 +213,7 @@ fun PreviewDemo() {
                     })
             }
         }
-
+        //endregion
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewDynamicIsland() {
-    val aniDuration = 1500L
-    var isExpanded by remember { mutableStateOf(false) }
-    var islandType by remember {
-        mutableStateOf<DynamicType>(
-            DynamicType.Line
-        )
-    }
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("类型: ${islandType.javaClass.simpleName}")
-        Spacer(modifier = Modifier.height(16.dp))
-        AutoDynamicIsland(type = islandType,
-            aniDuration = aniDuration,
-            isExpanded = isExpanded,
-            autoClose = true,
-            onIslandClick = { isExpanded = !isExpanded },
-            finishListener = {
-                if (!isExpanded) {
-                    islandType = islandType.nextType()
-                }
-            }) {
-            DynamicContentScreen(islandType)
-        }
-    }
-}
-
-/**
- * 演示用动态切换效果
- *
- * @param type
- */
-@Composable
-fun DynamicContentScreen(type: DynamicType) {
-    when (type) {
-        DynamicType.Line -> {
-            Text(
-                "简短通知🏝️", fontSize = 14.sp, color = Color.White
-            )
-        }
-        DynamicType.Card -> {
-            Column(verticalArrangement = Arrangement.Center) {
-                Text(
-                    "卡片通知🏝️️", fontSize = 16.sp, color = Color.White
-                )
-            }
-        }
-        DynamicType.Big -> {
-            Column(verticalArrangement = Arrangement.Center) {
-                Text(
-                    "扩展通知🏝️", fontSize = 16.sp, color = Color.White
-                )
-            }
-        }
-    }
-}
-
-/**
- * 预览效果测试
- *
- */
-@Preview(showBackground = true)
-@Composable
-fun PreviewSingleDynamicIsland() {
-
-    var isLineExpanded by remember { mutableStateOf(false) }
-    var isCardExpanded by remember { mutableStateOf(false) }
-    var isBigExpanded by remember { mutableStateOf(false) }
-    val aniDuration = 1500L
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("条幅通知")
-        Spacer(Modifier.height(16.dp))
-        AutoLineRoundIsland(
-            isExpanded = isLineExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isLineExpanded = !isLineExpanded }) {
-            Text(
-                text = "条幅岛🏝️", color = Color.White, fontSize = 14.sp
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text("卡片通知")
-        Spacer(Modifier.height(16.dp))
-        AutoCardRoundIsland(
-            isExpanded = isCardExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isCardExpanded = !isCardExpanded }) {
-            Text(
-                text = "卡片岛🏝️", color = Color.White, fontSize = 16.sp
-            )
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Text("扩展通知")
-        Spacer(Modifier.height(16.dp))
-        AutoBigRoundIsland(
-            isExpanded = isBigExpanded,
-            aniDuration = aniDuration,
-            autoClose = true,
-            onIslandClick = { isBigExpanded = !isBigExpanded }) {
-            Text(
-                text = "扩展岛🏝️", color = Color.White, fontSize = 16.sp
-            )
-        }
-    }
-}

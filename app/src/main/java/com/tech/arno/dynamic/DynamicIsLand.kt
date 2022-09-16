@@ -14,6 +14,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.tech.arno.dynamic.config.DynamicConfig
+import com.tech.arno.dynamic.config.DynamicDirection
+import com.tech.arno.dynamic.config.DynamicType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -28,7 +31,7 @@ import kotlinx.coroutines.launch
  * @param direction [DynamicDirection] 展开方向
  * @param autoClose [Boolean] 是否自动关闭
  * @param autoCloseInterval [Long] 自动关闭间隔
- * @param defaultSize [Dp] 默认大小
+ * @param defaultConfig [Dp] 默认大小
  * @param finishListener [Long] 展开动画时长
  * @param onIslandClick [() -> Unit] 点击岛屿回调
  * @param content [@Composable] 岛屿内容
@@ -41,7 +44,7 @@ fun AutoDynamicIsland(
     direction: DynamicDirection = DynamicDirection.Center,
     autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
-    defaultSize: DynamicConst.DynamicSize = DynamicConst.DynamicSize(
+    defaultConfig: DynamicConfig = DynamicConfig(
         height = DynamicConst.DEFAULT_HEIGHT,
         width = DynamicConst.DEFAULT_WIDTH,
         corner = DynamicConst.DEFAULT_CORNER
@@ -52,7 +55,7 @@ fun AutoDynamicIsland(
 ) {
     //region 初始设定
     val screenWidth = LocalConfiguration.current.screenWidthDp.dp
-    val targetSize by remember(type) { mutableStateOf(getTargetSizeByType(type, screenWidth)) }
+    val targetConfig by remember(type) { mutableStateOf(gettargetConfigByType(type, screenWidth)) }
     //endregion
 
     BasicAutoDynamicIsland(
@@ -62,8 +65,8 @@ fun AutoDynamicIsland(
         autoClose = autoClose,
         autoCloseInterval = autoCloseInterval,
         finishListener = finishListener,
-        defaultSize = defaultSize,
-        targetSize = targetSize,
+        defaultConfig = defaultConfig,
+        targetConfig = targetConfig,
         onIslandClick = onIslandClick,
         content = content
     )
@@ -78,8 +81,8 @@ fun AutoDynamicIsland(
  * @param direction [DynamicDirection] 布局方向
  * @param autoClose [Boolean] 是否自动关闭
  * @param autoCloseInterval [Long] 自动关闭间隔
- * @param defaultSize
- * @param targetSize
+ * @param defaultConfig
+ * @param targetConfig
  * @param finishListener
  * @param onIslandClick
  * @param content
@@ -91,8 +94,8 @@ inline fun BasicAutoDynamicIsland(
     direction: DynamicDirection = DynamicDirection.Center,
     autoClose: Boolean = false,
     autoCloseInterval: Long = 1500L,
-    defaultSize: DynamicConst.DynamicSize,
-    targetSize: DynamicConst.DynamicSize,
+    defaultConfig: DynamicConfig,
+    targetConfig: DynamicConfig,
     noinline finishListener: (() -> Unit)? = null,
     crossinline onIslandClick: () -> Unit,
     crossinline content: @Composable () -> Unit
@@ -114,8 +117,8 @@ inline fun BasicAutoDynamicIsland(
         direction = direction,
         aniDuration = aniDuration,
         isClickable = isClickable,
-        defaultSize = defaultSize,
-        targetSize = targetSize,
+        defaultConfig = defaultConfig,
+        targetConfig = targetConfig,
         finishListener = finishListener,
         onIslandClick = {
             isClickable = false
@@ -132,8 +135,8 @@ inline fun BasicAutoDynamicIsland(
  * @param direction [DynamicDirection] 展开方向
  * @param aniDuration 动画时长
  * @param isClickable 是否可点击
- * @param defaultSize 默认大小
- * @param targetSize 目标大小
+ * @param defaultConfig 默认大小
+ * @param targetConfig 目标大小
  * @param finishListener 动画结束监听
  * @param onIslandClick 点击事件
  * @param content 内容
@@ -144,8 +147,8 @@ fun BasicDynamicIsland(
     direction: DynamicDirection = DynamicDirection.Center,
     aniDuration: Long = DynamicConst.DEFAULT_ANIMATION_DURATION, //TODO
     isClickable: Boolean = true,
-    defaultSize: DynamicConst.DynamicSize,
-    targetSize: DynamicConst.DynamicSize,
+    defaultConfig: DynamicConfig,
+    targetConfig: DynamicConfig,
     finishListener: (() -> Unit)? = null,
     onIslandClick: () -> Unit,
     content: @Composable () -> Unit,
@@ -154,23 +157,23 @@ fun BasicDynamicIsland(
     val springSpec = Spring.DampingRatioLowBouncy
     //animateXXXAsState
     val widthState by animateDpAsState(
-        if (isExpanded) targetSize.width else defaultSize.width,
+        if (isExpanded) targetConfig.width else defaultConfig.width,
         animationSpec = spring(springSpec),
         finishedListener = { dp: Dp ->
             finishListener?.invoke()
         }
     )
     val heightState by animateDpAsState(
-        if (isExpanded) targetSize.height else defaultSize.height,
+        if (isExpanded) targetConfig.height else defaultConfig.height,
         animationSpec = spring(springSpec)
     )
     val cornerState by animateDpAsState(
-        if (isExpanded) targetSize.corner else defaultSize.corner,
+        if (isExpanded) targetConfig.corner else defaultConfig.corner,
         animationSpec = spring(springSpec)
     )
     val alignment by remember(direction) { mutableStateOf(getAlignmentByDirection(direction)) }
-    val offsetX by remember(defaultSize) { mutableStateOf(defaultSize.offsetX) }
-    val offsetY by remember(defaultSize) { mutableStateOf(defaultSize.offsetY) }
+    val offsetX by remember(defaultConfig) { mutableStateOf(defaultConfig.offsetX) }
+    val offsetY by remember(defaultConfig) { mutableStateOf(defaultConfig.offsetY) }
 
     Box(Modifier.offset(offsetX, offsetY)) {
         Card(
@@ -225,12 +228,12 @@ inline fun AutoLineRoundIsland(
         aniDuration = aniDuration,
         autoClose = autoClose,
         finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
+        defaultConfig = DynamicConfig(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
         ),
-        targetSize = DynamicConst.DynamicSize(
+        targetConfig = DynamicConfig(
             height = DynamicConst.LINE_HEIGHT,
             width = DynamicConst.LINE_WIDTH,
             corner = DynamicConst.LINE_CORNER,
@@ -262,12 +265,12 @@ inline fun AutoCardRoundIsland(
         aniDuration = aniDuration,
         autoClose = autoClose,
         finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
+        defaultConfig = DynamicConfig(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
         ),
-        targetSize = DynamicConst.DynamicSize(
+        targetConfig = DynamicConfig(
             height = DynamicConst.CARD_HEIGHT,
             width = DynamicConst.CARD_WIDTH,
             corner = DynamicConst.CARD_CORNER,
@@ -299,14 +302,14 @@ inline fun AutoBigRoundIsland(
         aniDuration = aniDuration,
         autoClose = autoClose,
         finishListener = finishListener,
-        defaultSize = DynamicConst.DynamicSize(
+        defaultConfig = DynamicConfig(
             height = DynamicConst.DEFAULT_HEIGHT,
             width = DynamicConst.DEFAULT_WIDTH,
             corner = DynamicConst.DEFAULT_CORNER,
             offsetX = DynamicConst.DEFAULT_OFFSET_X,
             offsetY = DynamicConst.DEFAULT_OFFSET_Y
         ),
-        targetSize = DynamicConst.DynamicSize(
+        targetConfig = DynamicConfig(
             height = DynamicConst.BIG_HEIGHT,
             width = LocalConfiguration.current.screenWidthDp.dp - DynamicConst.BIG_WIDTH_MARGIN,
             corner = DynamicConst.BIG_CORNER,
@@ -324,27 +327,27 @@ inline fun AutoBigRoundIsland(
  * @param screenWidthDp
  * @return
  */
-private fun getTargetSizeByType(
+private fun gettargetConfigByType(
     type: DynamicType,
     screenWidthDp: Dp
-): DynamicConst.DynamicSize {
+): DynamicConfig {
     return when (type) {
         DynamicType.Line -> {
-            DynamicConst.DynamicSize(
+            DynamicConfig(
                 height = DynamicConst.LINE_HEIGHT,
                 width = DynamicConst.LINE_WIDTH,
                 corner = DynamicConst.LINE_CORNER,
             )
         }
         DynamicType.Card -> {
-            DynamicConst.DynamicSize(
+            DynamicConfig(
                 height = DynamicConst.CARD_HEIGHT,
                 width = DynamicConst.CARD_WIDTH,
                 corner = DynamicConst.CARD_CORNER,
             )
         }
         DynamicType.Big -> {
-            DynamicConst.DynamicSize(
+            DynamicConfig(
                 height = DynamicConst.BIG_HEIGHT,
                 width = screenWidthDp - DynamicConst.BIG_WIDTH_MARGIN,
                 corner = DynamicConst.BIG_CORNER,

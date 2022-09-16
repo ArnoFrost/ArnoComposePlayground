@@ -22,10 +22,13 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.R
-import androidx.savedstate.SavedStateRegistryOwner
+import com.tech.arno.dynamic.config.DynamicConfig
+import com.tech.arno.dynamic.config.DynamicDirection
+import com.tech.arno.dynamic.config.DynamicType
 //import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import com.tech.arno.dynamic.service.FloatWindowLifecycleOwner
-import com.tech.arno.util.ReflectionUtils
+import com.tech.arno.dynamic.ui.DynamicConfigViewModel
+import com.tech.arno.dynamic.ui.DynamicConfigViewModelInterface
 
 class DynamicWindow(var context: Context) {
     private lateinit var windowManager: WindowManager
@@ -34,6 +37,7 @@ class DynamicWindow(var context: Context) {
 
     private var receiver: MyReceiver? = null
     private var floatingView: ComposeView? = null
+    val floatingViewModel: DynamicConfigViewModelInterface = DynamicConfigViewModel()
 
     private var x = 0
     private var y = 0
@@ -64,12 +68,13 @@ class DynamicWindow(var context: Context) {
         }
 
         // region init ComposeView
+
         floatingView = ComposeView(context).apply {
             // Dispose of the Composition when the view's LifecycleOwner
             // is destroyed
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                DynamicScreen()
+                DynamicScreen(floatingViewModel)
             }
         }
         floatingView?.let { composeView ->
@@ -86,7 +91,7 @@ class DynamicWindow(var context: Context) {
     }
 
     @Composable
-    private fun DynamicScreen() {
+    private fun DynamicScreen(viewModel: DynamicConfigViewModelInterface) {
         //region 配置属性
         val aniDuration = 3000L
         val autoCloseInterval = 3000L
@@ -104,7 +109,7 @@ class DynamicWindow(var context: Context) {
         var dynamicDefaultCorner by remember { mutableStateOf(24F) }
         val defaultSize = remember {
             derivedStateOf {
-                DynamicConst.DynamicSize(
+                DynamicConfig(
                     dynamicDefaultHeight.dp,
                     dynamicDefaultWidth.dp,
                     dynamicDefaultCorner.dp,
@@ -123,7 +128,7 @@ class DynamicWindow(var context: Context) {
             aniDuration = aniDuration,
             autoClose = true,
             autoCloseInterval = autoCloseInterval,
-            defaultSize = defaultSize.value,
+            defaultConfig = defaultSize.value,
             onIslandClick = triggerDynamic
         ) {
             DynamicContentScreen(islandType)
