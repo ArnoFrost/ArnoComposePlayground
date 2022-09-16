@@ -9,16 +9,21 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.tech.arno.dynamic.service.DynamicFloatService
+import com.blankj.utilcode.util.ToastUtils
+import com.tech.arno.dynamic.service.DynamicAccessibilityService
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlin.jvm.internal.Intrinsics
 
 class DynamicConfigActivity : ComponentActivity() {
     private val viewModel: DynamicActivityViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkOverlayPermission()
 
         setContent {
             Column(
@@ -27,18 +32,25 @@ class DynamicConfigActivity : ComponentActivity() {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.Start
             ) {
+                val checkAccessibility = viewModel.checkAccessibility.collectAsState()
+                val checkOverlayPermission = viewModel.checkOverlayPermission.collectAsState()
+
+                if (checkAccessibility.value) {
+                    checkAccessibilityPermission()
+                    viewModel.checkAccessibility.update { false }
+                }
+                if (checkOverlayPermission.value) {
+                    checkOverlayPermission()
+                    viewModel.checkOverlayPermission.update { false }
+                }
                 DynamicSettingScreen(viewModel)
-//                val x = DynamicWindow.floatingViewModel.offsetX.collectAsState(initial = 0F)
-//                val y = DynamicWindow.floatingViewModel.offsetY.collectAsState(initial = 0F)
-//                Box(
-//                    Modifier
-//                        .offset(x.value.dp, y.value.dp)
-//                        .fillMaxHeight()) {
-//                    DynamicFloatScreen(viewModel)
-//                }
             }
         }
         viewModel.injectFloatViewModel()
+    }
+
+    private fun initObserver() {
+
     }
 
     // method to ask user to grant the Overlay permission
@@ -46,16 +58,23 @@ class DynamicConfigActivity : ComponentActivity() {
         if (!Settings.canDrawOverlays(this)) {
             // send user to the device settings
             startActivity(Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION))
+        } else {
+            ToastUtils.showShort("已经允许覆盖界面")
         }
     }
 
-    private fun startService() {
-        // check if the user has already granted
-        // the Draw over other apps permission
-        if (Settings.canDrawOverlays(this)) {
-            // start the service based on the android version
-            startForegroundService(Intent(this, DynamicFloatService::class.java))
+    private fun checkAccessibilityPermission() {
+        if (!DynamicAccessibilityService.isReady) {
+            jumpAccessibilityServiceSettings(DynamicAccessibilityService::class.java)
+        } else {
+            ToastUtils.showShort("已经建立无障碍")
         }
+    }
+
+    private fun jumpAccessibilityServiceSettings(cls: Class<*>) {
+        Intrinsics.checkNotNullParameter(cls, "cls")
+        val intent = Intent("android.settings.ACCESSIBILITY_SETTINGS")
+        startActivity(intent)
     }
 }
 

@@ -112,10 +112,10 @@ class DynamicWindow(var context: Context) {
                     val level = intent.getIntExtra("level", 66)
                     viewModel.sendBattery(level)
                 }
-                Intent.ACTION_BATTERY_CHANGED -> {
-                    val level = intent.getIntExtra("level", 0)
-                    viewModel.sendBattery(level)
-                }
+//                Intent.ACTION_BATTERY_CHANGED -> {
+//                    val level = intent.getIntExtra("level", 0)
+//                    viewModel.sendBattery(level)
+//                }
             }
         }
     }

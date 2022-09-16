@@ -21,7 +21,7 @@ import com.tech.arno.dynamic.config.*
 
 
 @Composable
-fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
+fun DynamicSettingScreen(viewModel: DynamicActivityViewModel) {
     //region 配置属性
     val dynamicDefaultOffSetX = viewModel.offsetX.collectAsState(initial = 0F)
     val dynamicDefaultOffSetY = viewModel.offsetY.collectAsState(initial = 0F)
@@ -31,7 +31,24 @@ fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
     val screenWith = LocalConfiguration.current.screenWidthDp
     val scrollState = rememberScrollState()
     //endregion
+    //region 权限授予
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+        Button(
+            onClick = {
+                viewModel.clickAccessibility()
+            }) {
+            Text("授予无障碍权限")
+        }
 
+        Button(
+            onClick = {
+                viewModel.showOverlay()
+            }) {
+            Text("授予显示覆盖权限")
+        }
+    }
+    //endregion
+    Spacer(Modifier.height(16.dp))
     // region 测试按钮
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
         Button(
@@ -51,6 +68,12 @@ fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
                 viewModel.sendBigType()
             }) {
             Text("扩展")
+        }
+        Button(
+            onClick = {
+                viewModel.sendBattery(66)
+            }) {
+            Text("电池🔋")
         }
     }
     //endregion
@@ -165,6 +188,13 @@ fun DynamicSettingScreen(viewModel: DynamicConfigViewModelInterface) {
         }
     }
     //endregion
+    Spacer(Modifier.height(16.dp))
+    Button(
+        onClick = {
+            viewModel.saveConfig()
+        }) {
+        Text("保存配置")
+    }
 }
 
 @Composable

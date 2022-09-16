@@ -9,6 +9,8 @@ import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.blankj.utilcode.util.SPStaticUtils
+import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicType
 import com.tech.arno.dynamic.service.ComposeViewLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +26,16 @@ fun DynamicType.nextType(): DynamicType = when (this) {
     DynamicType.Card -> DynamicType.Big
     DynamicType.Big -> DynamicType.Battery
     DynamicType.Battery -> DynamicType.Line
+}
+
+fun DynamicConfig.save() {
+    SPStaticUtils.put("config", this.toJson())
+}
+
+fun String.fromJson(): DynamicConfig = if (this.isEmpty()) {
+    DynamicConfig()
+} else {
+    DynamicConfig.fromJson(this)
 }
 
 // Trick The ComposeView into thinking we are tracking lifecycle

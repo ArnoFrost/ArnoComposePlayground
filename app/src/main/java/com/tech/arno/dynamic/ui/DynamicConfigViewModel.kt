@@ -1,16 +1,27 @@
 package com.tech.arno.dynamic.ui
 
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.blankj.utilcode.util.SPStaticUtils
 import com.tech.arno.dynamic.component.DynamicWindow
+import com.tech.arno.dynamic.component.fromJson
+import com.tech.arno.dynamic.component.save
+import com.tech.arno.dynamic.config.DynamicConfig
 import com.tech.arno.dynamic.config.DynamicDirection
 import com.tech.arno.dynamic.config.DynamicMessage
 import com.tech.arno.dynamic.config.DynamicType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 interface DynamicConfigViewModelInterface {
+
+    val defaultConfig: DynamicConfig
+
     //动画时长
     val aniDuration: Flow<Long>
 
@@ -51,17 +62,9 @@ interface DynamicConfigViewModelInterface {
 }
 
 open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface {
-//    companion object {
-//        val composeViewModel by lazy {
-//            object : DynamicConfigViewModelInterface {
-//                private val _aniDuration = MutableStateFlow(3000L)
-//                override val aniDuration: Flow<Long>
-//                    get() = _aniDuration.asStateFlow()
-//            }
-//        }
-//    }
-
     protected val _aniDuration = MutableStateFlow(3000L)
+    final override val defaultConfig: DynamicConfig
+        get() = SPStaticUtils.getString("config", "").fromJson()
     override val aniDuration: Flow<Long>
         get() = _aniDuration.asStateFlow()
 
@@ -92,23 +95,23 @@ open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface 
         get() = _isLandMessage.asStateFlow()
 
 
-    protected val _offsetX = MutableStateFlow(0F)
+    protected val _offsetX = MutableStateFlow(defaultConfig.offsetX.value)
     override val offsetX: Flow<Float>
         get() = _offsetX.asStateFlow()
 
-    protected val _offsetY = MutableStateFlow(0F)
+    protected val _offsetY = MutableStateFlow(defaultConfig.offsetY.value)
     override val offsetY: Flow<Float>
         get() = _offsetY.asStateFlow()
 
-    protected val _width = MutableStateFlow(24F)
+    protected val _width = MutableStateFlow(defaultConfig.width.value)
     override val width: Flow<Float>
         get() = _width.asStateFlow()
 
-    protected val _height = MutableStateFlow(24F)
+    protected val _height = MutableStateFlow(defaultConfig.height.value)
     override val height: Flow<Float>
         get() = _height.asStateFlow()
 
-    protected val _corner = MutableStateFlow(24F)
+    protected val _corner = MutableStateFlow(defaultConfig.corner.value)
     override val corner: Flow<Float>
         get() = _corner.asStateFlow()
 
@@ -162,6 +165,9 @@ open class DynamicFloatViewModel : ViewModel(), DynamicConfigViewModelInterface 
 
 class DynamicActivityViewModel : DynamicFloatViewModel() {
     private var delegateViewModel: DynamicViewModelDelegate? = null
+
+    var checkOverlayPermission = MutableStateFlow(false)
+    var checkAccessibility = MutableStateFlow(false)
     override fun triggerDynamic() {
         //相反触发 TODO 队列变更待处理
         _isExpanded.update {
@@ -216,6 +222,28 @@ class DynamicActivityViewModel : DynamicFloatViewModel() {
             DynamicViewModelDelegate((DynamicWindow.viewModel) as DynamicFloatViewModel)
 
     }
+
+    fun clickAccessibility() {
+        checkAccessibility.update { true }
+    }
+
+    fun showOverlay() {
+        checkOverlayPermission.update { true }
+    }
+
+    fun saveConfig() {
+        val defaultConfig = DynamicConfig(
+            offsetX = _offsetX.value.dp,
+            offsetY = _offsetY.value.dp,
+            width = _width.value.dp,
+            height = _height.value.dp,
+            corner = _corner.value.dp
+        )
+        viewModelScope.launch(Dispatchers.IO) {
+            defaultConfig.save()
+        }
+    }
+
 }
 
 class DynamicViewModelDelegate(floatViewModel: DynamicConfigViewModelInterface) :

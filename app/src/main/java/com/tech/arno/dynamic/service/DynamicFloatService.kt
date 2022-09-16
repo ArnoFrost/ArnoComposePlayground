@@ -38,7 +38,7 @@ class DynamicFloatService : LifecycleService() {
         manager.createNotificationChannel(chan)
         val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
         val notification = notificationBuilder.setOngoing(true)
-            .setContentTitle("Service running")
+            .setContentTitle("Dynamic Running")
             .setContentText("Displaying over other apps") // this is important, otherwise the notification will show the way
             // you want i.e. it will show some default notification
             .setSmallIcon(R.drawable.ic_launcher_foreground)

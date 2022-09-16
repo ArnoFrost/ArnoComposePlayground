@@ -4,24 +4,34 @@ import android.accessibilityservice.AccessibilityService
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.blankj.utilcode.util.ToastUtils
 import com.tech.arno.R
 import com.tech.arno.dynamic.component.DynamicWindow
 
 class DynamicAccessibilityService : AccessibilityService() {
+    companion object {
+        var isReady = false
+    }
+
     private var dynamicWindow: DynamicWindow? = null
 
     override fun onCreate() {
+        isReady = true
         startMyOwnForeground()
         dynamicWindow = DynamicWindow(this).apply {
             init()
             showWindow()
         }
+        ToastUtils.showShort("开始运行🏝️")
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        isReady = false
         dynamicWindow?.destroy()
     }
 
